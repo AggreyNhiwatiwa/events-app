@@ -52,7 +52,8 @@ export default function Event({
   */
 
     const handleEventPress = () => {
-        if (!inFavouriteMode) {
+        //Means an event cannot be added to favourites multiple times
+        if (!inFavouriteMode && !isFavourite) {
             Alert.alert("Add to favourites?", `Add ${title} to favourites?`, [
                 {
                     text: "Cancel",
@@ -67,7 +68,7 @@ export default function Event({
                     },
                 },
             ]);
-        } else {
+        } else if(inFavouriteMode && isFavourite){
             Alert.alert(
                 "Remove from favourites?",
                 `Remove ${title} from your favourites?`,
