@@ -25,12 +25,12 @@ export async function getEventId(data) {
   let eventId;
 
   try {
-    const dbCollection = collection(db, "Events");
+    const dbCollection = collection(db, "events");
 
     const query = query(dbCollection, where("title", "==", data.title));
 
-    const bookSnapshot = await getDocs(query);
-    bookSnapshot.forEach((event) => {
+    const eventSnapshot = await getDocs(query);
+    eventSnapshot.forEach((event) => {
       eventId = event.id;
     });
 
@@ -46,7 +46,7 @@ In this case gets all the Events from the database
 */
 export async function getEventsFromDb() {
   const data = [];
-  const querySnapshot = await getDocs(collection(db, "Events"));
+  const querySnapshot = await getDocs(collection(db, "events"));
 
   querySnapshot.forEach((doc) => {
     console.log(`${doc.id} => ${doc.data()}`);
@@ -65,7 +65,7 @@ Gets a single Event from its ID
 */
 export async function getEventById(id) {
   try {
-    const docRef = doc(db, "Events", id);
+    const docRef = doc(db, "events", id);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {

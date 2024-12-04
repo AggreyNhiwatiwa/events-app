@@ -6,7 +6,7 @@ Lab 4
 */
 
 /*
-The Firebase write functions for the Books collection
+The Firebase write functions for the Events collection
 */
 
 import { doc, updateDoc } from "firebase/firestore";
@@ -18,7 +18,7 @@ Updates the favourite status of the event in the DB
 */
 export async function updateEvent(id, isFavourite) {
   try {
-    const docRef = doc(db, "Events", id);
+    const docRef = doc(db, "events", id);
 
     await updateDoc(docRef, {
       isFavourite: isFavourite,
