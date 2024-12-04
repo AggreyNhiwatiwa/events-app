@@ -27,7 +27,6 @@ export default function Event({
     date,
     time,
 }) {
-
     const {
         events,
         setEvents,
@@ -54,31 +53,76 @@ export default function Event({
 
     const handleEventPress = () => {
         if (!inFavouriteMode) {
+            Alert.alert("Add to favourites?", `Add ${title} to favourites?`, [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel",
+                },
+                {
+                    text: "OK",
+                    onPress: () => {
+                        console.log("OK Pressed");
+                        addToFavourites();
+                    },
+                },
+            ]);
+        } else {
             Alert.alert(
-                'Add to favourites?', 
-                `Add ${title} to favourites?`, 
+                "Remove from favourites?",
+                `Remove ${title} from your favourites?`,
                 [
                     {
-                        text: 'Cancel',
-                        onPress: () => console.log('Cancel Pressed'),
-                        style: 'cancel',
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel",
                     },
                     {
                         text: "OK",
                         onPress: () => {
                             console.log("OK Pressed");
-                            getCurrentEventFromDB();
+                            removeFromFavourites();
                         },
                     },
                 ]
             );
-        } else {
-            console.log("In favourite mode: no alert shown.");
         }
     };
 
-    const getCurrentEventFromDB = async () => {
+    //Add favourite event
+    const addToFavourites = async () => {
         try {
+            await database.updateEvent(id, true);
+
+            //Creating a new array with the updated Events's new false value to trigger a re-render (as nested)
+            //Also setting the current event as the event with an updated value to trigger a re-render
+            const updatedEvents = events.map((event) => {
+                if (event.id === id) {
+                    const updatedEvent = { ...event, isFavourite: true };
+
+                    //Go through favourite events array and remove item with matching ID to current item
+                    const updatedFavouriteEvents = [
+                        ...favouritedEvents,
+                        updatedEvent,
+                    ];
+                    setFavouritedEvents(updatedFavouriteEvents);
+
+                    return updatedEvent;
+                }
+                return event;
+            });
+
+            setEvents(updatedEvents);
+        } catch (error) {
+            console.log("Error loading data from the db:", error);
+        }
+    };
+
+    //Remove favourite event
+
+    const removeFromFavourites = async () => {
+        try {
+            // Await the database update and remove the .then() chain
             await database.updateEvent(id, false);
 
             //Go through favourite events array and remove item with matching ID to current item
@@ -88,10 +132,16 @@ export default function Event({
 
             setFavouritedEvents(updatedFavouriteEvents);
 
-            //Creating a new array with the updated Event's new false value to trigger a re-render (as nested)
-            const updatedEvents = events.map((event) =>
-                event.id === id ? { ...event, isFavourite: false } : event
-            );
+            //Creating a new array with the updated Events's new false value to trigger a re-render (as nested)
+            //Also setting the current event as the event with an updated value to trigger a re-render
+            const updatedEvents = events.map((event) => {
+                if (event.id === id) {
+                    const updatedEvent = { ...event, isFavourite: false };
+                    setCurrentEvent(updatedEvent);
+                    return updatedEvent;
+                }
+                return event;
+            });
 
             setEvents(updatedEvents);
         } catch (error) {
@@ -102,10 +152,7 @@ export default function Event({
     return (
         <Pressable style={styles.container} onPress={handleEventPress}>
             <View style={styles.leftContainer}>
-                <MaterialCommunityIcons
-                    name={"calendar-month"}
-                    size={30}
-                />
+                <MaterialCommunityIcons name={"calendar-month"} size={30} />
             </View>
 
             <View style={styles.rightContainer}>
