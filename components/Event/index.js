@@ -11,12 +11,12 @@ Component that renders an Event item using database data
 
 import styles from "./styles";
 import { useContext } from "react";
-import { Alert, Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
 import * as database from "../../database";
 import { EventContext } from "../../context/EventContext";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Alert } from "react-native";
 
 export default function Event({
     id,
@@ -27,6 +27,7 @@ export default function Event({
     date,
     time,
 }) {
+
     const {
         events,
         setEvents,
@@ -37,6 +38,7 @@ export default function Event({
     } = useContext(EventContext);
     const navigation = useNavigation();
 
+    console.log("favvvmode: ", inFavouriteMode);
     /*
   Press handler with 2 internal Event press handler actions, which action is triggered 
   upon press depends on the value of the global inFavouriteMode variable.
@@ -49,25 +51,29 @@ export default function Event({
 
   Note, each attribute relates to the current book 
   */
+
     const handleEventPress = () => {
-        if (inFavouriteMode) {
-            Alert.alert(`Add the event: ${title} to favourites?`, [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel",
-                },
-                {
-                    text: "OK",
-                    onPress: () => {
-                        console.log("OK Pressed");
-                        getCurrentEventFromDB();
+        if (!inFavouriteMode) {
+            Alert.alert(
+                'Add to favourites?', 
+                `Add ${title} to favourites?`, 
+                [
+                    {
+                        text: 'Cancel',
+                        onPress: () => console.log('Cancel Pressed'),
+                        style: 'cancel',
                     },
-                },
-            ]);
+                    {
+                        text: "OK",
+                        onPress: () => {
+                            console.log("OK Pressed");
+                            getCurrentEventFromDB();
+                        },
+                    },
+                ]
+            );
         } else {
-            const pressedEvent = events.find((event) => event.id === id);
-            setCurrentEvent(pressedEvent);
+            console.log("In favourite mode: no alert shown.");
         }
     };
 
