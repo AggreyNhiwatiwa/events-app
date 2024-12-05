@@ -57,6 +57,22 @@ const styles = StyleSheet.create({
   availableText: {
     color: "#007038",
   },
+  modalContainer: {
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    padding: 10, 
+},
+inputContainer: {
+  fontSize: 20,
+  margin: 20,
+  width: 350,
+  height: 40,
+  textAlign: "center",
+  borderWidth: 2,
+  borderRadius: 4,
+  borderColor: "#808080",
+},
 });
 
 export default styles;

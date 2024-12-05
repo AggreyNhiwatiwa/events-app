@@ -51,6 +51,9 @@ export default function App() {
 
             //Sets this event to the state
             setFavouritedEvents(initialFavouritedEvents);
+
+            
+
           })
           .catch((error) => {
             console.log(error);

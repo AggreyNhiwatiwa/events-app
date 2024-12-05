@@ -9,19 +9,6 @@ Lab 4
 Simply renders the list of favourited events.
 Similar logic to the all events screen, but only gets the favourite events from the context
 */
-
-/*
-Aggrey Nhiwatiwa
-1152301
-INFO-6132 
-Lab 3
-*/
-
-/*
-Simply renders the list of borrowed books.
-Similar logic to books screen, but only gets the borrowed books list from the context, not the whole list
-of Books
-*/
 import { FlatList, Text, View } from "react-native";
 import { useCallback, useContext } from "react";
 import styles from "./styles";
@@ -67,7 +54,7 @@ export default function FavouriteEventsScreen() {
         {favouritedEvents.length === 0 ? (
           <Text style={styles.infoBarText}>No events added to favourites</Text>
         ) : (
-          <Text style={styles.infoBarText}>Pressn event to remove it from your favourites</Text>
+          <Text style={styles.infoBarText}>Press an event to remove it from your favourites</Text>
         )}
       </View>
     </View>
