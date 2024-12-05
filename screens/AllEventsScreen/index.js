@@ -16,7 +16,7 @@ import { EventContext } from "../../context/EventContext";
 import Event from "../../components/Event";
 
 export default function AllEventsScreen() {
-  const { events, setInFavouriteMode } = useContext(EventContext);
+  const { events, setInFavouriteMode, setInEditingMode } = useContext(EventContext);
 
   /*
   useFocusEffect hook to ensure that whenever the Books screen is navigated to, the
@@ -25,6 +25,7 @@ export default function AllEventsScreen() {
   useFocusEffect(
     useCallback(() => {
       setInFavouriteMode(false);
+      setInEditingMode(false);
     }, [])
   );
 
