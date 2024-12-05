@@ -32,6 +32,26 @@ export async function updateEvent(id, isFavourite) {
     }
 }
 
+export async function updateEventNew (id, updatedEvent) {
+    try {
+        const docRef = doc(db, "events", id);
+
+        await updateDoc(docRef, {
+            title: updatedEvent.title,
+            description: updatedEvent.description,
+            isFavourite: updatedEvent.isFavourite,
+            date: updatedEvent.date,
+            time: updatedEvent.time,
+        });
+
+        console.log("Successfully updated events in DB");
+        return true;
+    } catch (e) {
+        console.log("Error updating event in DB", e.message);
+        return false;
+    }
+}
+
 /*
 Adds a new event to the DB
 Also returns the ID of the newly added event

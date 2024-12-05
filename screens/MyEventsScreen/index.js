@@ -50,7 +50,7 @@ export default function MyEventsScreen() {
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (
-                <Button onPress={handleShowModal} title="Add" color="#FFFFFF" />
+                <Button onPress={handleShowAddModal} title="Add" color="#FFFFFF" />
             ),
         });
     }, [navigation]);
@@ -60,7 +60,7 @@ export default function MyEventsScreen() {
   */
     //Using state to show whether or not a modal should be shown
     //Initially the modal is not shown (set as false)
-    const [showModal, setShowModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [initFavourite, setInitFavourite] = useState(false);
     const [eventTitle, setEventTitle] = useState("");
     const [eventDescription, setEventDescription] = useState("");
@@ -69,20 +69,16 @@ export default function MyEventsScreen() {
         useState(false);
     const [titleErrTxt, setTitleErrTxt] = useState("");
     const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
-    const [date, setDate] = useState(new Date()); //Else just init to todays date
-    const [time, setTime] = useState(new Date()); //Else just init to todays date
+    const [date, setDate] = useState(new Date()); 
+    const [time, setTime] = useState(new Date()); 
 
-    //Setting show modal as opposite in UI
-    const handleModalToggle = () => {
-        setShowModal(!showModal);
+
+    const handleShowAddModal = () => {
+        setShowAddModal(true);
     };
 
-    const handleShowModal = () => {
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
+    const handleCloseAddModal = () => {
+        setShowAddModal(false);
     };
 
     //Setting show modal as opposite in UI
@@ -146,6 +142,7 @@ export default function MyEventsScreen() {
                 ...prevEvents,
                 { ...newEvent, id: result },
             ]);
+            setShowAddModal(false);
         } else {
             console.log("Failed to add to db.");
         }
@@ -180,7 +177,7 @@ export default function MyEventsScreen() {
                     </Text>
                 </View>
             </View>
-            <Modal visible={showModal} animationType="slide">
+            <Modal visible={showAddModal} animationType="slide">
                 <View style={styles.modalContainer}>
                     <Text style={styles.modalTitle}>Add Event</Text>
                     <TextInput
@@ -220,7 +217,7 @@ export default function MyEventsScreen() {
                     </Pressable>
                     <Pressable
                         style={styles.modalButton}
-                        onPress={handleCloseModal}
+                        onPress={handleCloseAddModal}
                     >
                         <Text style={styles.modalButtonText}>Close</Text>
                     </Pressable>

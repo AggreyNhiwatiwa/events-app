@@ -20,6 +20,7 @@ import * as database from "../../database";
 import { EventContext } from "../../context/EventContext";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Alert } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function Event({
     id,
@@ -42,7 +43,7 @@ export default function Event({
     const navigation = useNavigation();
 
     //State
-    const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [initFavourite, setInitFavourite] = useState(false);
     const [eventTitle, setEventTitle] = useState("");
     const [eventDescription, setEventDescription] = useState("");
@@ -51,10 +52,15 @@ export default function Event({
         useState(false);
     const [titleErrTxt, setTitleErrTxt] = useState("");
     const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedTime, setSelectedTime] = useState(new Date());
 
-    //Setting show modal as opposite in UI
-    const handleModalToggle = () => {
-        setShowModal(!showModal);
+    const handleShowEditModal = () => {
+        setShowEditModal(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
     };
 
     //Setting show modal as opposite in UI
@@ -66,7 +72,7 @@ export default function Event({
   Sanity check for title 
   */
     const handleTitleChange = (value) => {
-        setTitle(value);
+        setEventTitle(value);
 
         if (value.length === 0) {
             setEventTitleIsValid(false);
@@ -87,6 +93,43 @@ export default function Event({
             setEventDescriptionIsValid(true);
             setDescriptionErrTxt("");
         }
+    };
+
+    const handleDateChange = (event, selectedDate) => {
+        setSelectedDate(selectedDate);
+    };
+
+    const handleTimeChange = (event, selectedTime) => {
+        setSelectedTime(selectedTime);
+    };
+
+    //Adding the new event to the DB
+    const handleEditEvent = async () => {
+        //Create an updated async object locally
+        const updatedEvent = {
+            title: eventTitle,
+            description: eventDescription,
+            date: selectedDate.toLocaleDateString(),
+            time: selectedTime.toLocaleTimeString(),
+            isFavourite: initFavourite,
+        };
+
+        //Add to db
+        const result = await database.updateEventNew(id, updatedEvent);
+        console.log("Result: ", result);
+
+        //If successful, add it to list of current events and update state for rerender trigger
+        if (result) {
+            setEvents((prevEvents) => [
+                ...prevEvents,
+                { ...updatedEvent, id: result },
+            ]);
+            setShowEditModal(false);
+        } else {
+            console.log("Failed to add to db.");
+        }
+
+        //TODO add to personal my events list
     };
 
     /*
@@ -138,9 +181,8 @@ export default function Event({
                     },
                 ]
             );
-       
         } else if (inEditingMode) {
-            handleModalToggle();
+            handleShowEditModal();
         }
     };
 
@@ -228,24 +270,53 @@ export default function Event({
                 </View>
             </Pressable>
 
-            <Modal visible={showModal} animationType="slide">
+            <Modal visible={showEditModal} animationType="slide">
                 <View style={styles.modalContainer}>
-                    <Text>Add new Event?</Text>
-                    <TextInput style={styles.inputContainer}
-                        //placeholder="Enter an event description"
+                    <Text style={styles.modalTitle}>Add Event</Text>
+                    <TextInput
+                        style={styles.inputContainer}
+                        placeholder="Enter an event title"
+                        maxLength={150}
+                        onChangeText={handleTitleChange}
+                        defaultValue={eventTitle}
+                    />
+                    <TextInput
+                        style={styles.inputContainer}
+                        placeholder="Enter an event description"
                         maxLength={150}
                         onChangeText={handleDescriptionChange}
-                        defaultValue={description}
+                        defaultValue={eventDescription}
                     />
-                    <View>
-                        <Text>Add to favourites?:</Text>
+                    <DateTimePicker
+                        value={selectedDate}
+                        onChange={handleDateChange}
+                    />
+                    <DateTimePicker
+                        mode="time"
+                        value={selectedTime}
+                        onChange={handleTimeChange}
+                    />
+                    <View style={styles.switchContainer}>
+                        <Text style={styles.switchText}>
+                            Add to favourites?:
+                        </Text>
                         <Switch
                             value={initFavourite}
                             onValueChange={handleInitFavouriteToggle}
                         />
                     </View>
-                    <Button title="Add" />
-                    <Button title="Close" onPress={handleModalToggle}/>
+                    <Pressable
+                        style={styles.modalButton}
+                        onPress={handleEditEvent}
+                    >
+                        <Text style={styles.modalButtonText}>Edit</Text>
+                    </Pressable>
+                    <Pressable
+                        style={styles.modalButton}
+                        onPress={handleCloseEditModal}
+                    >
+                        <Text style={styles.modalButtonText}>Close</Text>
+                    </Pressable>
                 </View>
             </Modal>
         </>
