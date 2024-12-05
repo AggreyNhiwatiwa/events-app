@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { Button, Modal, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import {
+    createUserWithEmailAndPassword,
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signOut,
@@ -26,6 +27,9 @@ export default function LoginScreen({ setCredentials }) {
 
     const { isAuthenticated, setIsAuthenticated, authId, setAuthId } =
         useContext(AuthContext);
+
+    const [showSignUpModal, setShowSignUpModal] = useState(false);
+    const [signUpBtnDisabled, setSignUpBtnDisabled] = useState(true);
 
     /*
   Ensures that there are no active users signed in when the login page is entered
@@ -57,6 +61,10 @@ export default function LoginScreen({ setCredentials }) {
         setShowModal(!showModal);
     };
 
+    const handleSignUpModalToggle = () => {
+        setShowSignUpModal(!showSignUpModal);
+    };
+
     /*
   Sanity check for email
   Regex pattern obtained via https://regexr.com/
@@ -71,10 +79,12 @@ export default function LoginScreen({ setCredentials }) {
             setEmailIsValid(false);
             setEmailErrTxt("Please enter a valid email");
             setPasswordResetBtnDisabled(true);
+            setSignUpBtnDisabled(true);
         } else {
             setEmailIsValid(true);
             setEmailErrTxt("");
             setPasswordResetBtnDisabled(false);
+            setSignUpBtnDisabled(false);
         }
     };
 
@@ -99,7 +109,6 @@ export default function LoginScreen({ setCredentials }) {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
-                console.log("authedUser: ", user);
 
                 //SetAuthId
                 setAuthId(user.uid);
@@ -109,6 +118,48 @@ export default function LoginScreen({ setCredentials }) {
             })
             .catch(() => {
                 showErrorToast("Incorrect username or password");
+                handlePwdChange("");
+            });
+    };
+
+    /*
+  Signs up a new user to make an account 
+  */
+    const handleSignUpPress = () => {
+        setShowSignUpModal();
+    };
+
+    const handleSignUpConfirm = () => {
+        //When button pressed, input valid by means of regex
+        createUserWithEmailAndPassword(auth, email, pwd)
+            .then((userCredential) => {
+                const user = userCredential.user;
+
+                // Set context auths
+                setAuthId(user.uid);
+                setIsAuthenticated(true);
+
+                showSuccessToast("Account created successfully");
+            })
+            .catch((error) => {
+                console.error("Error signing up: ", error.message);
+
+                // Using prebuilt errors for use in Toast:
+                //https://firebase.google.com/docs/auth/admin/errors
+                // No need for email format err, as handled by regex
+
+                //TODO, errs currently trigger expo errs also, see if this can be cirumvented
+
+                if (error.code === "auth/email-already-in-use") {
+                    showErrorToast("The Email you entered is already in use.");
+                } else if (error.code === "auth/weak-password") {
+                    showErrorToast("Please enter a stronger password.");
+                } else {
+                    showErrorToast(
+                        "An error occured while signing up, please try again."
+                    );
+                }
+
                 handlePwdChange("");
             });
     };
@@ -137,8 +188,10 @@ export default function LoginScreen({ setCredentials }) {
     const updateLoginButtonState = () => {
         if (emailIsValid && pwdIsValid) {
             setLoginBtnDisabled(false);
+            setSignUpBtnDisabled(false);
         } else {
             setLoginBtnDisabled(true);
+            setSignUpBtnDisabled(true);
         }
     };
 
@@ -197,6 +250,8 @@ export default function LoginScreen({ setCredentials }) {
                     onPress={handleForgotPasswordPress}
                 ></Button>
 
+                <Button title="Sign up" onPress={handleSignUpPress}></Button>
+
                 <View style={styles.footer}>
                     <Text>Aggrey Nhiwatiwa © Copyright 2024</Text>
                 </View>
@@ -215,15 +270,51 @@ export default function LoginScreen({ setCredentials }) {
                         <InputMsgBox text={emailErrTxt}></InputMsgBox>
 
                         <Button
+                            title="Send Password Reset Link"
                             onClick={handleSendPasswordResetLink}
                             disabled={passwordResetBtnDisabled}
-                        >
-                            Send Password Reset Link
-                        </Button>
+                        ></Button>
 
                         <Button
                             title="Close"
                             onPress={handleModalToggle}
+                        ></Button>
+                    </View>
+                    <Toast />
+                </Modal>
+
+                <Modal animationType="slide" visible={showSignUpModal}>
+                    <View style={styles.modalView}>
+                        <TextInput
+                            style={styles.textInputContainer}
+                            placeholder="Email Address"
+                            onChangeText={handleEmailChange}
+                            value={email}
+                            keyboardType={"email"}
+                            autoCapitalize="none"
+                        />
+
+                        <InputMsgBox text={emailErrTxt}></InputMsgBox>
+
+                        <TextInput
+                            style={styles.textInputContainer}
+                            placeholder="Password"
+                            onChangeText={handlePwdChange}
+                            secureTextEntry={true}
+                            value={pwd}
+                        />
+
+                        <InputMsgBox text={pwdErrTxt}></InputMsgBox>
+
+                        <Button
+                            title="Sign up"
+                            onPress={handleSignUpConfirm}
+                            disabled={signUpBtnDisabled}
+                        ></Button>
+
+                        <Button
+                            title="Close"
+                            onPress={handleSignUpModalToggle}
                         ></Button>
                     </View>
                     <Toast />
