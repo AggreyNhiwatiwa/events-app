@@ -8,4 +8,4 @@ Lab 4
 /* Centralised location for exporting database functions */
 
 export { getEventId, getEventsFromDb, getEventsById } from "./read";
-export { addEvent, updateEvent, updateEventNew } from "./write";
+export { addEvent, deleteEvent, updateEvent, updateEventNew } from "./write";

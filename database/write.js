@@ -9,7 +9,13 @@ Lab 4
 The Firebase write functions for the Events collection
 */
 
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    updateDoc,
+} from "firebase/firestore";
 
 import { db } from "./config";
 
@@ -32,7 +38,7 @@ export async function updateEvent(id, isFavourite) {
     }
 }
 
-export async function updateEventNew (id, updatedEvent) {
+export async function updateEventNew(id, updatedEvent) {
     try {
         const docRef = doc(db, "events", id);
 
@@ -52,6 +58,19 @@ export async function updateEventNew (id, updatedEvent) {
     }
 }
 
+export async function deleteEvent(id) {
+    try {
+        const docRef = doc(db, "events", id); 
+        await deleteDoc(docRef); 
+
+        console.log("Successfully deleted event with ID:", id);
+        return true; 
+    } catch (e) {
+        console.error("Error deleting event in DB:", e.message);
+        return false; 
+    }
+}
+
 /*
 Adds a new event to the DB
 Also returns the ID of the newly added event
@@ -61,12 +80,12 @@ export async function addEvent(newEvent) {
         const collectionRef = collection(db, "events");
 
         const docRef = await addDoc(collectionRef, {
-          //id: newEvent.id,
-          title: newEvent.title,
-          description: newEvent.description,
-          isFavourite: newEvent.isFavourite,
-          date: newEvent.date,
-          time: newEvent.time,
+            //id: newEvent.id,
+            title: newEvent.title,
+            description: newEvent.description,
+            isFavourite: newEvent.isFavourite,
+            date: newEvent.date,
+            time: newEvent.time,
         });
 
         console.log("New Event successfully added with ID:", docRef.id);

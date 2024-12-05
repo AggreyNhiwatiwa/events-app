@@ -116,7 +116,6 @@ export default function Event({
 
         //Add to db
         const result = await database.updateEventNew(id, updatedEvent);
-        console.log("Result: ", result);
 
         //If successful, add it to list of current events and update state for rerender trigger
         if (result) {
@@ -132,6 +131,21 @@ export default function Event({
         //TODO add to personal my events list
     };
 
+    //Deleting the pressed event from the DB
+    const handleDeleteEvent = async () => {
+        const result = await database.deleteEvent(id);
+
+        //If the deletion is successful, removing it from the local state and updating it to trigger a re-render
+        if (result) {
+            setEvents((prevEvents) =>
+                prevEvents.filter((event) => event.id !== id)
+            );
+            setShowEditModal(false);
+            console.log("Event deleted successfully");
+        } else {
+            console.log("Failed to delete event from the database.");
+        }
+    };
     /*
   Press handler with 2 internal Event press handler actions, which action is triggered 
   upon press depends on the value of the global inFavouriteMode variable.
@@ -147,7 +161,10 @@ export default function Event({
 
     const handleEventPress = () => {
         //Means an event cannot be added to favourites multiple times
-        if (!inFavouriteMode && !isFavourite) {
+
+        if (inEditingMode) {
+            handleShowEditModal();
+        } else if (!inFavouriteMode && !isFavourite) {
             Alert.alert("Add to favourites?", `Add ${title} to favourites?`, [
                 {
                     text: "Cancel",
@@ -181,8 +198,6 @@ export default function Event({
                     },
                 ]
             );
-        } else if (inEditingMode) {
-            handleShowEditModal();
         }
     };
 
@@ -310,6 +325,12 @@ export default function Event({
                         onPress={handleEditEvent}
                     >
                         <Text style={styles.modalButtonText}>Edit</Text>
+                    </Pressable>
+                    <Pressable
+                        style={styles.modalButton}
+                        onPress={handleDeleteEvent}
+                    >
+                        <Text style={styles.modalButtonText}>Delete</Text>
                     </Pressable>
                     <Pressable
                         style={styles.modalButton}
