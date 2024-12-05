@@ -1,5 +1,5 @@
 import styles from "./styles";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button, Modal, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import {
@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import InputMsgBox from "../../components/InputMsgBox";
 import { auth } from "../../database/config";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function LoginScreen({ setCredentials }) {
     /* States */
@@ -22,6 +23,9 @@ export default function LoginScreen({ setCredentials }) {
         useState(true);
     const [emailIsValid, setEmailIsValid] = useState(false);
     const [pwdIsValid, setPwdIsValid] = useState(false);
+
+    const { isAuthenticated, setIsAuthenticated, authId, setAuthId } =
+        useContext(AuthContext);
 
     /*
   Ensures that there are no active users signed in when the login page is entered
@@ -95,6 +99,12 @@ export default function LoginScreen({ setCredentials }) {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
+                console.log("authedUser: ", user);
+
+                //SetAuthId
+                setAuthId(user.uid);
+                setIsAuthenticated(true);
+
                 showSuccessToast("Login successful");
             })
             .catch(() => {
