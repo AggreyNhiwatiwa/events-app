@@ -56,6 +56,15 @@ export default function App() {
 
                         //Sets this event to the state
                         setFavouritedEvents(initialFavouritedEvents);
+
+                        //Getting just the events for the current user and setting to state
+                        if (authId) {
+                            const initialMyEvents = dbEvents.filter(
+                                (event) => (event.authorId === authId)
+                            );
+
+                            setMyEvents(initialMyEvents);
+                        }
                     })
                     .catch((error) => {
                         console.log(error);

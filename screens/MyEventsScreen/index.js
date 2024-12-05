@@ -26,16 +26,21 @@ import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import { EventContext } from "../../context/EventContext";
+import { AuthContext } from "../../context/AuthContext";
 import Event from "../../components/Event";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as database from "../../database";
 
+
 //Currently testing with the existing list of items
 export default function MyEventsScreen() {
-    const { events, setEvents, setInFavouriteMode, setInEditingMode } =
+    const { events, setEvents, setInFavouriteMode, setInEditingMode, myEvents } =
         useContext(EventContext);
     const navigation = useNavigation();
+
+    const { isAuthenticated, setIsAuthenticated, authId, setAuthId } =
+    useContext(AuthContext);
 
     /*
   useFocusEffect hook to ensure that whenever the Events screen is navigated to, the
@@ -123,13 +128,14 @@ export default function MyEventsScreen() {
 
     //Adding the new event to the DB
     const handleAddNewEvent = async () => {
-        //Create a new event object locally
+        //Create a new event object locally, gets authorId from global context
         const newEvent = {
             title: eventTitle,
             description: eventDescription,
             date: date.toLocaleDateString(),
             time: time.toLocaleTimeString(),
             isFavourite: initFavourite,
+            authorId: authId,
         };
 
         //Add to db
@@ -167,7 +173,7 @@ export default function MyEventsScreen() {
             <View style={styles.container}>
                 <FlatList
                     style={styles.flatListContent}
-                    data={events}
+                    data={myEvents}
                     keyExtractor={(item) => item.id}
                     renderItem={renderItem}
                 />

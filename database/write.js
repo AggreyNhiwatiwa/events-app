@@ -81,6 +81,7 @@ export async function addEvent(newEvent) {
 
         const docRef = await addDoc(collectionRef, {
             //id: newEvent.id,
+            authorId: newEvent.authorId,
             title: newEvent.title,
             description: newEvent.description,
             isFavourite: newEvent.isFavourite,
