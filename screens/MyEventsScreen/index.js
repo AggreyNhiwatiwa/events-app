@@ -32,15 +32,22 @@ import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as database from "../../database";
 
+import { signOut } from "firebase/auth";
+import { auth } from "../../database/config";
 
 //Currently testing with the existing list of items
 export default function MyEventsScreen() {
-    const { events, setEvents, setInFavouriteMode, setInEditingMode, myEvents } =
-        useContext(EventContext);
+    const {
+        events,
+        setEvents,
+        setInFavouriteMode,
+        setInEditingMode,
+        myEvents,
+    } = useContext(EventContext);
     const navigation = useNavigation();
 
     const { isAuthenticated, setIsAuthenticated, authId, setAuthId } =
-    useContext(AuthContext);
+        useContext(AuthContext);
 
     /*
   useFocusEffect hook to ensure that whenever the Events screen is navigated to, the
@@ -54,11 +61,42 @@ export default function MyEventsScreen() {
 
     useEffect(() => {
         navigation.setOptions({
+            headerLeft: () => (
+                <Button
+                    onPress={handleLogout}
+                    title="Log Out"
+                    color="#FFFFFF"
+                />
+            ),
             headerRight: () => (
-                <Button onPress={handleShowAddModal} title="Add" color="#FFFFFF" />
+                <Button
+                    onPress={handleShowAddModal}
+                    title="Add"
+                    color="#FFFFFF"
+                />
             ),
         });
     }, [navigation]);
+
+
+    //TODO: Add success/err toasts here
+    const handleLogout = () => {
+        signOut(auth)
+        .then(() => {
+
+            //resetting state
+            setIsAuthenticated(false);
+            setAuthId(null);
+            console.log("Successfully signed out");
+
+        })
+        .catch(() => {
+            console.log("Error signing users out");
+        });
+    };
+
+
+
 
     /*
   Method to show the add modal
@@ -74,9 +112,8 @@ export default function MyEventsScreen() {
         useState(false);
     const [titleErrTxt, setTitleErrTxt] = useState("");
     const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
-    const [date, setDate] = useState(new Date()); 
-    const [time, setTime] = useState(new Date()); 
-
+    const [date, setDate] = useState(new Date());
+    const [time, setTime] = useState(new Date());
 
     const handleShowAddModal = () => {
         setShowAddModal(true);
