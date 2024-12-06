@@ -43,6 +43,7 @@ export default function MyEventsScreen() {
         setInFavouriteMode,
         setInEditingMode,
         myEvents,
+        setMyEvents,
     } = useContext(EventContext);
     const navigation = useNavigation();
 
@@ -94,7 +95,6 @@ export default function MyEventsScreen() {
             console.log("Error signing users out");
         });
     };
-
 
 
 
@@ -181,7 +181,7 @@ export default function MyEventsScreen() {
 
         //If successful, add it to list of current events and update state for rerender trigger
         if (result) {
-            setEvents((prevEvents) => [
+            setMyEvents((prevEvents) => [
                 ...prevEvents,
                 { ...newEvent, id: result },
             ]);
