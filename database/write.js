@@ -60,14 +60,14 @@ export async function updateEventNew(id, updatedEvent) {
 
 export async function deleteEvent(id) {
     try {
-        const docRef = doc(db, "events", id); 
-        await deleteDoc(docRef); 
+        const docRef = doc(db, "events", id);
+        await deleteDoc(docRef);
 
         console.log("Successfully deleted event with ID:", id);
-        return true; 
+        return true;
     } catch (e) {
         console.error("Error deleting event in DB:", e.message);
-        return false; 
+        return false;
     }
 }
 
@@ -93,6 +93,27 @@ export async function addEvent(newEvent) {
         return docRef.id;
     } catch (e) {
         console.log("Error adding new Event to DB:", e.message);
+        return null;
+    }
+}
+
+/*
+Add new user to the "users" collection in the db
+*/
+export async function addUser(fullName, email, uid) {
+    try {
+        const collectionRef = collection(db, "users");
+
+        const docRef = await addDoc(collectionRef, {
+            id: uid,
+            fullName: fullName,
+            email: email,
+        });
+
+        console.log("New User successfully added with ID:", docRef.id);
+        return docRef.id;
+    } catch (e) {
+        console.log("Error adding new User to DB:", e.message);
         return null;
     }
 }

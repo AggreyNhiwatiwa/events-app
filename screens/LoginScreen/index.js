@@ -11,6 +11,7 @@ import {
 import InputMsgBox from "../../components/InputMsgBox";
 import { auth } from "../../database/config";
 import { AuthContext } from "../../context/AuthContext";
+import * as database from "../../database";
 
 export default function LoginScreen({ setCredentials }) {
     /* States */
@@ -134,6 +135,10 @@ export default function LoginScreen({ setCredentials }) {
         createUserWithEmailAndPassword(auth, email, pwd)
             .then((userCredential) => {
                 const user = userCredential.user;
+
+                //Adding user to the "users" collection in the db
+                database.addUser("Test name", email, user.uid);
+
 
                 // Set context auths
                 setAuthId(user.uid);
