@@ -15,6 +15,7 @@ import {
     deleteDoc,
     doc,
     updateDoc,
+    setDoc,
 } from "firebase/firestore";
 
 import { db } from "./config";
@@ -99,16 +100,25 @@ export async function addEvent(newEvent) {
 
 /*
 Add new user to the "users" collection in the db
+This step also initialises the favourites subcollection for each specific user
+When making a subcollection, Firestore needs a document, hence an empty document is created here
+If this is also deleted, the whole subcollection will be also
+Therefore when getting a users favourites, the backend logic will keep the empty doument there 
+without it being involved in the business logic
 */
 export async function addUser(fullName, email, uid) {
     try {
         const collectionRef = collection(db, "users");
 
         const docRef = await addDoc(collectionRef, {
-            id: uid,
+            authId: uid,
             fullName: fullName,
             email: email,
         });
+
+        //Id here as Id of the actual user document, not the auth id
+        const favouritesRef = doc(db, `users/${docRef.id}/favourites/emptyDoc`);
+        await setDoc(favouritesRef, {});
 
         console.log("New User successfully added with ID:", docRef.id);
         return docRef.id;
@@ -117,3 +127,4 @@ export async function addUser(fullName, email, uid) {
         return null;
     }
 }
+
