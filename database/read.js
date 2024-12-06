@@ -15,6 +15,7 @@ import {
   where,
   doc,
   getDoc,
+  query
 } from "firebase/firestore";
 import { db } from "./config";
 
@@ -49,8 +50,7 @@ export async function getEventsFromDb() {
   const querySnapshot = await getDocs(collection(db, "events"));
 
   querySnapshot.forEach((doc) => {
-    console.log(`${doc.id} => ${doc.data()}`);
-
+    
     const post = {
       ...doc.data(),
       id: doc.id,
@@ -77,5 +77,60 @@ export async function getEventById(id) {
   } catch (error) {
     console.log("Error getting the event object with the provided ID" + error);
     return null;
+  }
+}
+
+/*
+Helper function to get the current userId from the authId
+*/
+export async function getUserDocIdByAuthId(authId) {
+  try {
+      const usersRef = collection(db, "users");
+      const idQuery = query(usersRef, where("authId", "==", authId));
+      const querySnapshot = await getDocs(idQuery);
+
+      if (!querySnapshot.empty) {
+          // Docs is an array, so as authId is unique just return the first (only) element in the array
+          return querySnapshot.docs[0].id;
+      } else {
+          console.error("No user found with the passed authId.");
+          return null;
+      }
+  } catch (error) {
+      console.error("Error fetching user document ID:", error.message);
+      return null;
+  }
+}
+
+
+/*
+Gets the list of favourites for a given user
+from the favourites subcollection in the users collection
+Uses the authId
+The emptyDoc placeholder is skipped so that it is not included in the business logic
+*/
+export async function getFavouritesForUser(userId) {
+  try {
+    const data = [];
+    const favouritesRef = collection(db, `users/${userId}/favourites`);
+    const querySnapshot = await getDocs(favouritesRef);
+
+    // Ignoring the placeholder
+    querySnapshot.forEach((doc) => {
+      if (doc.id === "emptyDoc") {
+        return;
+      }
+
+      const favourite = {
+        ...doc.data(),
+        id: doc.id,
+      };
+      data.push(favourite);
+    });
+
+    return data;
+  } catch (e) {
+    console.error("Error fetching favourites:", e.message);
+    return [];
   }
 }

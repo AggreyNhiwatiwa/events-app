@@ -106,15 +106,20 @@ If this is also deleted, the whole subcollection will be also
 Therefore when getting a users favourites, the backend logic will keep the empty doument there 
 without it being involved in the business logic
 */
-export async function addUser(fullName, email, uid) {
+export async function addUser(fullName, email, authId) {
     try {
         const collectionRef = collection(db, "users");
 
         const docRef = await addDoc(collectionRef, {
-            authId: uid,
+           // id: "",
+            authId: authId,
             fullName: fullName,
             email: email,
         });
+
+        //Adding the newly created docs ID as ID
+        // const userDocRef = doc(db, `users/${docRef.id}`);
+        // await updateDoc(userDocRef, { id: docRef.id });
 
         //Id here as Id of the actual user document, not the auth id
         const favouritesRef = doc(db, `users/${docRef.id}/favourites/emptyDoc`);

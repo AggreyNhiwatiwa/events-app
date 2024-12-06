@@ -7,5 +7,5 @@ Lab 4
 
 /* Centralised location for exporting database functions */
 
-export { getEventId, getEventsFromDb, getEventsById } from "./read";
+export { getEventId, getEventsFromDb, getFavouritesForUser, getUserDocIdByAuthId } from "./read";
 export { addEvent, deleteEvent, updateEvent, updateEventNew, addUser } from "./write";
