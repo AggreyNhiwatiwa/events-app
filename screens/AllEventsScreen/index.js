@@ -6,7 +6,7 @@ Lab 4
 */
 
 /*
-Component that simply renders the list of Books from the Database
+Component that simply renders the list of Events from the Database
 */
 import { FlatList, Text, View } from "react-native";
 import { useCallback, useContext } from "react";
@@ -19,7 +19,7 @@ export default function AllEventsScreen() {
   const { events, setInFavouriteMode, setInEditingMode } = useContext(EventContext);
 
   /*
-  useFocusEffect hook to ensure that whenever the Books screen is navigated to, the
+  useFocusEffect hook to ensure that whenever the Events screen is navigated to, the
   global boolean for inBorrowingMode is set to false
   */
   useFocusEffect(

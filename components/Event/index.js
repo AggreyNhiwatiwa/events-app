@@ -5,42 +5,44 @@ INFO-6132
 Lab 4
 */
 
-/*
-Component that renders an Event item using database data
-
-An event item can have several onPress behaviours depending on the context it is displayed in.
-*/
-
-import styles from "./styles";
+// First party imports
 import { useContext, useEffect, useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
-import { Button, FlatList, Modal, Switch, TextInput } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import * as database from "../../database";
-import { EventContext } from "../../context/EventContext";
+import {
+    Alert,
+    Modal,
+    Pressable,
+    Switch,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
+
+// Third party imports
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function Event({
-    id,
-    authorId,
-    title,
-    isFavourite,
-    description,
-    date,
-    time,
-}) {
+// Project imports
+import styles from "./styles";
+import * as database from "../../database";
+import { AuthContext } from "../../context/AuthContext";
+import { EventContext } from "../../context/EventContext";
+
+/*
+Component that renders an Event item using database data.
+The Event item has a dynamic onPress action dependent on where in the app
+the item is rendered.
+*/
+
+export default function Event({ id, title, description }) {
     const {
         events,
         setEvents,
         favouritedEvents,
         setFavouritedEvents,
-        setCurrentEvent,
         inFavouriteMode,
         inEditingMode,
     } = useContext(EventContext);
-    const navigation = useNavigation();
+    const { authId } = useContext(AuthContext);
 
     //State
     const [showEditModal, setShowEditModal] = useState(false);
@@ -54,7 +56,30 @@ export default function Event({
     const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState(new Date());
+    const [eventIsFavourited, setEventIsFavourited] = useState(null);
 
+    /* 
+    Helper function which checks whether the current element (from its Id)
+    exists in the local list of favourite events
+    */
+    const isEventFavourited = (eventIdToCheck) => {
+        return favouritedEvents.some(
+            (favEvent) => favEvent.id === eventIdToCheck
+        );
+    };
+
+    /*
+    Whenever the list of favourites or the current event (id) changes, 
+    the boolean evaluation on whether it is a favourite or not from the 
+    local state is triggered to update the UI
+    */
+    useEffect(() => {
+        setEventIsFavourited(isEventFavourited(id));
+    }, [favouritedEvents, id]);
+
+    /* Handlers */
+
+    // Add and Edit handlers
     const handleShowEditModal = () => {
         setShowEditModal(true);
     };
@@ -63,14 +88,10 @@ export default function Event({
         setShowEditModal(false);
     };
 
-    //Setting show modal as opposite in UI
     const handleInitFavouriteToggle = () => {
         setInitFavourite(!initFavourite);
     };
 
-    /*
-  Sanity check for title 
-  */
     const handleTitleChange = (value) => {
         setEventTitle(value);
 
@@ -88,13 +109,15 @@ export default function Event({
 
         if (value.length === 0) {
             setEventDescriptionIsValid(false);
-            setDescriptionErrTxt("Please enter a title");
+            setDescriptionErrTxt("Please enter a description");
         } else {
             setEventDescriptionIsValid(true);
             setDescriptionErrTxt("");
         }
     };
 
+    // The event parameter here is a placeholder, as the
+    // second argument must be a date object per the documentation
     const handleDateChange = (event, selectedDate) => {
         setSelectedDate(selectedDate);
     };
@@ -103,9 +126,15 @@ export default function Event({
         setSelectedTime(selectedTime);
     };
 
-    //Adding the new event to the DB
+    /* Async Database operations */
+
+    /*
+    Creates a local Event object with values from the modal and then 
+    updates the currently edited item with these updated values.
+    As the database is the source of truth, the local state is only
+    updates when the update is successful in the database.
+    */
     const handleEditEvent = async () => {
-        //Create an updated async object locally
         const updatedEvent = {
             title: eventTitle,
             description: eventDescription,
@@ -114,32 +143,31 @@ export default function Event({
             isFavourite: initFavourite,
         };
 
-        //Add to db
-        const result = await database.updateEventNew(id, updatedEvent);
+        const success = await database.updateEventNew(id, updatedEvent);
 
-        //If successful, add it to list of current events and update state for rerender trigger
-        if (result) {
-            setEvents((prevEvents) => [
-                ...prevEvents,
-                { ...updatedEvent, id: result },
-            ]);
+        if (success) {
+            const updatedEvents = [...events, { ...updatedEvent, id: success }];
+            setEvents(updatedEvents);
             setShowEditModal(false);
         } else {
             console.log("Failed to add to db.");
         }
 
-        //TODO add to personal my events list
+        //TODO: add to personal my events list if needed
     };
 
-    //Deleting the pressed event from the DB
+    /*
+    Removes an event from the global events list.
+    Note that as this method is only active in the MyEvents list (which filters events
+    made by the current user), by design no additional checks are needed for editing/deleting 
+    authorisation
+    */
     const handleDeleteEvent = async () => {
         const result = await database.deleteEvent(id);
 
-        //If the deletion is successful, removing it from the local state and updating it to trigger a re-render
         if (result) {
-            setEvents((prevEvents) =>
-                prevEvents.filter((event) => event.id !== id)
-            );
+            const updatedEvents = events.filter((event) => event.id !== id);
+            setEvents(updatedEvents);
             setShowEditModal(false);
             console.log("Event deleted successfully");
         } else {
@@ -147,53 +175,61 @@ export default function Event({
         }
     };
     /*
-  Press handler with 2 internal Event press handler actions, which action is triggered 
-  upon press depends on the value of the global inFavouriteMode variable.
+    Event press handler with dynamic events:
 
-  If the Events screen is shown, the inFavouriteMode variable is set to false and clicking an Event component 
-  will not do anything
+    If on the Events screen: Pressing an event will show an alert. If the event is already
+    in the users favourites a one button alert will inform the user of this. If the event 
+    is not a favourite, the user has the option to add it.
 
-  If the Favourite screen is shown, the inFavouriteMode variable is set to true and clicking an Event
-  component brings up an alert which enables a user to unfavourite an Event.
+    If on the Favourites screen: Pressing an event shows an alert which enables a user to 
+    unfavourite an Event. 
 
-  Note, each attribute relates to the current book 
-  */
-
+    If on the MyEvents screen: Pressing an event brings up a modal to edit or delete an event.
+    */
     const handleEventPress = () => {
-        //Means an event cannot be added to favourites multiple times
-
         if (inEditingMode) {
             handleShowEditModal();
-        } else if (!inFavouriteMode && !isFavourite) {
-            Alert.alert("Add to favourites?", `Add ${title} to favourites?`, [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel",
-                },
-                {
-                    text: "OK",
-                    onPress: () => {
-                        console.log("OK Pressed");
-                        addToFavourites();
-                    },
-                },
-            ]);
-        } else if (inFavouriteMode && isFavourite) {
+            return;
+        }
+
+        setEventIsFavourited(isEventFavourited(id));
+
+        if (inFavouriteMode) {
             Alert.alert(
                 "Remove from favourites?",
-                `Remove ${title} from your favourites?`,
+                `Remove the event "${title}" from your favourites?`,
                 [
                     {
                         text: "Cancel",
-                        onPress: () => console.log("Cancel Pressed"),
                         style: "cancel",
                     },
                     {
                         text: "OK",
                         onPress: () => {
-                            console.log("OK Pressed");
-                            removeFromFavourites();
+                            handleRemoveFromFavourites();
+                        },
+                    },
+                ]
+            );
+        } else if (eventIsFavourited && !inFavouriteMode) {
+            Alert.alert(
+                "Already in favourites",
+                `The event "${title}" is already in your favourites.`,
+                [{ text: "OK" }]
+            );
+        } else {
+            Alert.alert(
+                "Add to favourites?",
+                `Add event "${title}" to favourites?`,
+                [
+                    {
+                        text: "Cancel",
+                        style: "cancel",
+                    },
+                    {
+                        text: "OK",
+                        onPress: () => {
+                            handleAddToFavourites();
                         },
                     },
                 ]
@@ -201,69 +237,59 @@ export default function Event({
         }
     };
 
-    //Add favourite event
-    const addToFavourites = async () => {
+    /*
+    Adding an event to a users favourites in thebefore updating the local state, using
+    the database as the source of truth.
+    */
+    const handleAddToFavourites = async () => {
         try {
-            await database.updateEvent(id, true);
+            const currEvent = await database.getEventById(id);
+            const userId = await database.getUserDocIdByAuthId(authId);
+            const success = await database.addFavouriteForUser(userId, id);
 
-            //Creating a new array with the updated Events's new false value to trigger a re-render (as nested)
-            //Also setting the current event as the event with an updated value to trigger a re-render
-            const updatedEvents = events.map((event) => {
-                if (event.id === id) {
-                    const updatedEvent = { ...event, isFavourite: true };
-
-                    //Go through favourite events array and remove item with matching ID to current item
-                    const updatedFavouriteEvents = [
-                        ...favouritedEvents,
-                        updatedEvent,
-                    ];
-                    setFavouritedEvents(updatedFavouriteEvents);
-
-                    return updatedEvent;
-                }
-                return event;
-            });
-
-            setEvents(updatedEvents);
+            if (success) {
+                const updatedFavourites = [...favouritedEvents, currEvent];
+                setFavouritedEvents(updatedFavourites);
+                setEventIsFavourited(true);
+                console.log("Event added successfully");
+            } else {
+                console.error("Failed to add event to favourites.");
+            }
         } catch (error) {
-            console.log("Error loading data from the db:", error);
+            console.error("Error adding event to favourites:", error);
         }
     };
 
-    //Remove favourite event
-
-    const removeFromFavourites = async () => {
+    /*
+    Adding an event to a users favourites in the db before updating the local state, using
+    the database as the source of truth.
+    */
+    const handleRemoveFromFavourites = async () => {
         try {
-            // Await the database update and remove the .then() chain
-            await database.updateEvent(id, false);
+            const userId = await database.getUserDocIdByAuthId(authId);
+            const success = await database.removeFavouriteForUser(userId, id);
 
-            //Go through favourite events array and remove item with matching ID to current item
-            const updatedFavouriteEvents = favouritedEvents.filter(
-                (event) => event.id !== id
-            );
-
-            setFavouritedEvents(updatedFavouriteEvents);
-
-            //Creating a new array with the updated Events's new false value to trigger a re-render (as nested)
-            //Also setting the current event as the event with an updated value to trigger a re-render
-            const updatedEvents = events.map((event) => {
-                if (event.id === id) {
-                    const updatedEvent = { ...event, isFavourite: false };
-                    setCurrentEvent(updatedEvent);
-                    return updatedEvent;
-                }
-                return event;
-            });
-
-            setEvents(updatedEvents);
+            if (success) {
+                const updatedFavourites = favouritedEvents.filter(
+                    (event) => event.id !== id
+                );
+                setFavouritedEvents(updatedFavourites);
+                setEventIsFavourited(false);
+                console.log("Event deleted successfully");
+            } else {
+                console.log("Failed to delete event from the database.");
+            }
         } catch (error) {
-            console.log("Error loading data from the db:", error);
+            console.error("Error adding event to favourites:", error);
         }
     };
 
     return (
         <>
-            <Pressable style={styles.container} onPress={handleEventPress}>
+            <Pressable
+                style={styles.container}
+                onPress={() => handleEventPress(id)}
+            >
                 <View style={styles.leftContainer}>
                     <MaterialCommunityIcons name={"calendar-month"} size={30} />
                 </View>
@@ -275,12 +301,12 @@ export default function Event({
                     <Text
                         style={[
                             styles.subHeading,
-                            isFavourite
-                                ? styles.borrowedText
-                                : styles.availableText,
+                            eventIsFavourited
+                                ? styles.availableText
+                                : styles.borrowedText,
                         ]}
                     >
-                        {isFavourite ? "Favourite" : "Not favourite"}
+                        {eventIsFavourited ? "Favourite" : "Not favourite"}
                     </Text>
                 </View>
             </Pressable>

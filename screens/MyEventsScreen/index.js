@@ -35,7 +35,6 @@ import * as database from "../../database";
 import { signOut } from "firebase/auth";
 import { auth } from "../../database/config";
 
-//Currently testing with the existing list of items
 export default function MyEventsScreen() {
     const {
         events,
@@ -44,6 +43,7 @@ export default function MyEventsScreen() {
         setInEditingMode,
         myEvents,
         setMyEvents,
+        setFavouritedEvents,
     } = useContext(EventContext);
     const navigation = useNavigation();
 
@@ -51,12 +51,15 @@ export default function MyEventsScreen() {
         useContext(AuthContext);
 
     /*
-  useFocusEffect hook to ensure that whenever the Events screen is navigated to, the
-  global boolean for inBorrowingMode is set to false
-  */
+    useFocusEffect hook to ensure that whenever MyScreen is navigated to, the
+    global boolean for inEditingMode is set to true, as only the event author can
+    edit or delete posts authored by themselves. This allows event UI items to have
+    favourite specific onPress actions.
+    */
     useFocusEffect(
         useCallback(() => {
             setInEditingMode(true);
+            setInFavouriteMode(false);
         }, [])
     );
 
@@ -79,30 +82,22 @@ export default function MyEventsScreen() {
         });
     }, [navigation]);
 
-
     //TODO: Add success/err toasts here
     const handleLogout = () => {
         signOut(auth)
-        .then(() => {
-
-            //resetting state
-            setIsAuthenticated(false);
-            setAuthId(null);
-            console.log("Successfully signed out");
-
-        })
-        .catch(() => {
-            console.log("Error signing users out");
-        });
+            .then(() => {
+                //resetting states
+                setIsAuthenticated(false);
+                setAuthId(null);
+                setFavouritedEvents([]);
+                setMyEvents([]);
+                console.log("Successfully signed out");
+            })
+            .catch(() => {
+                console.log("Error signing users out");
+            });
     };
 
-
-
-    /*
-  Method to show the add modal
-  */
-    //Using state to show whether or not a modal should be shown
-    //Initially the modal is not shown (set as false)
     const [showAddModal, setShowAddModal] = useState(false);
     const [initFavourite, setInitFavourite] = useState(false);
     const [eventTitle, setEventTitle] = useState("");
@@ -129,8 +124,8 @@ export default function MyEventsScreen() {
     };
 
     /*
-  Sanity check for title 
-  */
+    Sanity check for title 
+    */
     const handleTitleChange = (value) => {
         setEventTitle(value);
 
@@ -163,9 +158,11 @@ export default function MyEventsScreen() {
         setTime(selectedTime);
     };
 
-    //Adding the new event to the DB
+    /*
+    Adding the new event to the DB
+    Gets authorId from global context
+    */
     const handleAddNewEvent = async () => {
-        //Create a new event object locally, gets authorId from global context
         const newEvent = {
             title: eventTitle,
             description: eventDescription,
@@ -174,17 +171,12 @@ export default function MyEventsScreen() {
             isFavourite: initFavourite,
             authorId: authId,
         };
-
-        //Add to db
         const result = await database.addEvent(newEvent);
-        console.log("Result: ", result);
 
-        //If successful, add it to list of current events and update state for rerender trigger
         if (result) {
-            setMyEvents((prevEvents) => [
-                ...prevEvents,
-                { ...newEvent, id: result },
-            ]);
+            const newEventWithId = { ...newEvent, id: result };
+            const updatedEvents = [...myEvents, newEventWithId];
+            setMyEvents(updatedEvents);
             setShowAddModal(false);
         } else {
             console.log("Failed to add to db.");

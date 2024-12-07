@@ -32,7 +32,7 @@ export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authId, setAuthId] = useState(null);
     const [userId, setUserId] = useState(null);
-
+  
     useEffect(() => {
       async function loadAllEvents() {
           try {
@@ -46,7 +46,6 @@ export default function App() {
                   description: event.description,
                   date: event.date,
                   time: event.time,
-                  isFavourite: event.isFavourite,
               }));
               setEvents(dbEvents);
   
@@ -70,7 +69,7 @@ export default function App() {
       }
   
       loadAllEvents();
-  }, []); 
+  }, [authId]); 
 
     if (events === null) {
         return <Text>Please wait</Text>;

@@ -18,15 +18,17 @@ import Event from "../../components/Event";
 
 export default function FavouriteEventsScreen() {
 
-  const { events, favouritedEvents, setInFavouriteMode } = useContext(EventContext);
+  const { events, favouritedEvents, setInFavouriteMode, setInEditingMode } = useContext(EventContext);
 
   /*
-  useFocusEffect hook to ensure that whenever the Borrowed screen is navigated to, the
-  global boolean for inBorrowingMode is set to true 
+  useFocusEffect hook to ensure that whenever the FavouritesScreen is navigated to, the
+  global boolean for inFavouriteMode is set to true, which allows event UI items to have
+  favourite specific onPress actions
   */
   useFocusEffect(
     useCallback(() => {
       setInFavouriteMode(true);
+      setInEditingMode(false);
     }, [])
   );
 
@@ -35,7 +37,6 @@ export default function FavouriteEventsScreen() {
       id={item.id}
       authorId={item.authorId}
       title={item.title}
-      isFavourite={item.isFavourite}
       description={item.description}
       date={item.date}
       time={item.time}

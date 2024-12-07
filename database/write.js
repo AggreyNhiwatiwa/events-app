@@ -16,28 +16,11 @@ import {
     doc,
     updateDoc,
     setDoc,
+    arrayUnion,
+    arrayRemove
 } from "firebase/firestore";
-
 import { db } from "./config";
 
-/*
-Updates the favourite status of the event in the DB
-*/
-export async function updateEvent(id, isFavourite) {
-    try {
-        const docRef = doc(db, "events", id);
-
-        await updateDoc(docRef, {
-            isFavourite: isFavourite,
-        });
-
-        console.log("Successfully updated events in DB");
-        return true;
-    } catch (e) {
-        console.log("Error updating event in DB", e.message);
-        return false;
-    }
-}
 
 export async function updateEventNew(id, updatedEvent) {
     try {
@@ -53,8 +36,8 @@ export async function updateEventNew(id, updatedEvent) {
 
         console.log("Successfully updated events in DB");
         return true;
-    } catch (e) {
-        console.log("Error updating event in DB", e.message);
+    } catch (error) {
+        console.log("Error updating event in DB", error.message);
         return false;
     }
 }
@@ -66,8 +49,8 @@ export async function deleteEvent(id) {
 
         console.log("Successfully deleted event with ID:", id);
         return true;
-    } catch (e) {
-        console.error("Error deleting event in DB:", e.message);
+    } catch (error) {
+        console.error("Error deleting event in DB:", error.message);
         return false;
     }
 }
@@ -90,10 +73,13 @@ export async function addEvent(newEvent) {
             time: newEvent.time,
         });
 
+        // Updating the document to include its id in the db itself
+        await updateDoc(docRef, { id: docRef.id });
+
         console.log("New Event successfully added with ID:", docRef.id);
         return docRef.id;
-    } catch (e) {
-        console.log("Error adding new Event to DB:", e.message);
+    } catch (error) {
+        console.log("Error adding new Event to DB:", error.message);
         return null;
     }
 }
@@ -111,15 +97,10 @@ export async function addUser(fullName, email, authId) {
         const collectionRef = collection(db, "users");
 
         const docRef = await addDoc(collectionRef, {
-           // id: "",
             authId: authId,
             fullName: fullName,
             email: email,
         });
-
-        //Adding the newly created docs ID as ID
-        // const userDocRef = doc(db, `users/${docRef.id}`);
-        // await updateDoc(userDocRef, { id: docRef.id });
 
         //Id here as Id of the actual user document, not the auth id
         const favouritesRef = doc(db, `users/${docRef.id}/favourites/emptyDoc`);
@@ -127,9 +108,52 @@ export async function addUser(fullName, email, authId) {
 
         console.log("New User successfully added with ID:", docRef.id);
         return docRef.id;
-    } catch (e) {
-        console.log("Error adding new User to DB:", e.message);
+    } catch (error) {
+        console.log("Error adding new User to DB:", error.message);
         return null;
     }
 }
 
+
+/*
+Adding the given event to a given users favourites by adding the eventId to the 
+favouriteEvents property of the user.
+arrayUnion from Firestore to add unique elements to an array property (which favouriteEvents is).
+*/
+export async function addFavouriteForUser(userId, eventId) {
+    try {
+      const userRef = doc(db, "users", userId);
+
+      await updateDoc(userRef, {
+        favoriteEvents: arrayUnion(eventId),
+      });
+  
+      console.log(`Event ${eventId} added to user ${userId}'s favorites.`);
+      return true;
+    } catch (error) {
+      console.error("Error adding favorite event:", error.message);
+      return false;
+    }
+  }
+  
+/*
+The reverse of the addFavouriteUser function
+arrayRemove is the opposite of arrayUnion and allows specified elements to be removed from
+an array property, like favouriteEvents.
+*/
+  export async function removeFavouriteForUser(userId, eventId) {
+    try {
+
+      const userRef = doc(db, "users", userId);
+  
+      await updateDoc(userRef, {
+        favoriteEvents: arrayRemove(eventId),
+      });
+  
+      console.log(`Event ${eventId} removed from user ${userId}'s favorites.`);
+      return true;
+    } catch (error) {
+      console.error("Error removing favorite event:", error.message);
+      return false;
+    }
+  }
