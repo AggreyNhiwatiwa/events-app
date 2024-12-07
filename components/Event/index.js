@@ -20,6 +20,7 @@ import {
 // Third party imports
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { parse } from "date-fns";
 
 // Project imports
 import styles from "./styles";
@@ -49,16 +50,41 @@ export default function Event({ id, title, description, date, time }) {
     //State
     const [showEditModal, setShowEditModal] = useState(false);
     const [initFavourite, setInitFavourite] = useState(false);
-    const [eventTitle, setEventTitle] = useState("");
-    const [eventDescription, setEventDescription] = useState("");
+    const [eventTitle, setEventTitle] = useState(title);
+    const [eventDescription, setEventDescription] = useState(description);
     const [eventTitleIsValid, setEventTitleIsValid] = useState(false);
     const [eventDescriptionIsValid, setEventDescriptionIsValid] =
         useState(false);
     const [titleErrTxt, setTitleErrTxt] = useState("");
     const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const [selectedTime, setSelectedTime] = useState(new Date());
+    const [initialDate, setInitialDate] = useState(date);
     const [eventIsFavourited, setEventIsFavourited] = useState(null);
+
+    /*
+    Handling date and time
+
+    The issue I encountered is that the DateTimePicker component requires a Date object
+    When editing, I want to set the defaultValue of this component to be that of the object
+    (as opposed to the current date and time from newDate()).
+
+    The issue is that the passed date and time got converted to a string when it was added to the db
+    in the myEvents screen:
+    date: date.toLocaleDateString(),
+    time: time.toLocaleTimeString(),
+
+    Therefore I need to convert this back to a Date object to meet my goals in a more elegant way than
+    having to write a custom formatter
+
+    Therefore I found the following package:
+    https://www.npmjs.com/package/date-fns
+
+    Which contains a parse method to dynamically parse strings correctly based on their locale.
+    */
+    const dateAsDate = parse(date, "dd/MM/yyyy", new Date());
+    const timeAsDate = parse(time, "HH:mm:ss", new Date());
+
+    const [selectedDate, setSelectedDate] = useState(dateAsDate);
+    const [selectedTime, setSelectedTime] = useState(timeAsDate);
 
     /* 
     Helper function which checks whether the current element (from its Id)
@@ -99,10 +125,6 @@ export default function Event({ id, title, description, date, time }) {
 
     const handleCloseEditModal = () => {
         setShowEditModal(false);
-    };
-
-    const handleInitFavouriteToggle = () => {
-        setInitFavourite(!initFavourite);
     };
 
     const handleTitleChange = (value) => {
@@ -366,24 +388,25 @@ export default function Event({ id, title, description, date, time }) {
                         placeholder="Enter an event title"
                         maxLength={150}
                         onChangeText={handleTitleChange}
-                        defaultValue={title}
+                        value={eventTitle}
                     />
                     <TextInput
                         style={styles.inputContainer}
                         placeholder="Enter an event description"
                         maxLength={150}
                         onChangeText={handleDescriptionChange}
-                        defaultValue={description}
+                        value={eventDescription}
                     />
                     <DateTimePicker
                         value={selectedDate}
                         onChange={handleDateChange}
-                        defaultValue={date}
+                        defaultValue={dateAsDate}
                     />
                     <DateTimePicker
                         mode="time"
                         value={selectedTime}
                         onChange={handleTimeChange}
+                        defaultValue={timeAsDate}
                     />
                     <Pressable
                         style={styles.modalButton}

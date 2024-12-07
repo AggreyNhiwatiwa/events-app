@@ -212,7 +212,6 @@ export default function MyEventsScreen() {
             id={item.id}
             authorId={item.authorId}
             title={item.title}
-  
             description={item.description}
             date={item.date}
             time={item.time}
