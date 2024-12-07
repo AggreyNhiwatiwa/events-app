@@ -58,8 +58,11 @@ export async function deleteEvent(id) {
 /*
 Adds a new event to the DB
 Also returns the ID of the newly added event
+
+If the event author initialises isFavourite to true, the method to
+add the event to the users favouriteEvents array is called
 */
-export async function addEvent(newEvent) {
+export async function addEvent(newEvent, userId) {
     try {
         const collectionRef = collection(db, "events");
 
@@ -68,13 +71,17 @@ export async function addEvent(newEvent) {
             authorId: newEvent.authorId,
             title: newEvent.title,
             description: newEvent.description,
-            isFavourite: newEvent.isFavourite,
             date: newEvent.date,
             time: newEvent.time,
         });
 
         // Updating the document to include its id in the db itself
         await updateDoc(docRef, { id: docRef.id });
+
+        if(newEvent.isFavourite){
+
+            await addFavouriteForUser(userId, docRef.id);
+        }
 
         console.log("New Event successfully added with ID:", docRef.id);
         return docRef.id;

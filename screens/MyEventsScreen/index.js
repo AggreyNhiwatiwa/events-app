@@ -9,6 +9,8 @@ Lab 4
 Simply renders the list of events created by the currently logged in user.
 
 When an Event in this list is pressed, it allows it to be edited (this logic is handled in the Event component)
+
+The modal here is for adding and event, while the modal defined in Event is for editing a component
 */
 
 import {
@@ -171,12 +173,20 @@ export default function MyEventsScreen() {
             isFavourite: initFavourite,
             authorId: authId,
         };
-        const result = await database.addEvent(newEvent);
+        const userId = await database.getUserDocIdByAuthId(authId);
+        const result = await database.addEvent(newEvent, userId);
 
         if (result) {
             const newEventWithId = { ...newEvent, id: result };
             const updatedEvents = [...myEvents, newEventWithId];
             setMyEvents(updatedEvents);
+
+
+            // Also updating the favourite events state in case it was added
+            // to the users favourites upon creation
+            const updatedFavourites = await database.getFavouritesForUser(userId);
+            setFavouritedEvents(updatedFavourites);
+
             setShowAddModal(false);
         } else {
             console.log("Failed to add to db.");
@@ -190,7 +200,7 @@ export default function MyEventsScreen() {
             id={item.id}
             authorId={item.authorId}
             title={item.title}
-            isFavourite={item.isFavourite}
+  
             description={item.description}
             date={item.date}
             time={item.time}

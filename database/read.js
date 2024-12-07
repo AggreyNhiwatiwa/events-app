@@ -140,6 +140,12 @@ export async function getFavouritesForUser(userId) {
 
         const favoriteEventIds = userDoc.data().favoriteEvents || [];
 
+        // Added check here, otherwise the "in" query will fail (as it can't be run on empty array).
+        if (favoriteEventIds.length === 0) {
+            console.log("The user has no favourite events");
+            return [];
+        }
+
         const eventsRef = collection(db, "events");
         const eventsQuery = query(
             eventsRef,

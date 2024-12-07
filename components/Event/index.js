@@ -39,6 +39,8 @@ export default function Event({ id, title, description }) {
         setEvents,
         favouritedEvents,
         setFavouritedEvents,
+        myEvents,
+        setMyEvents,
         inFavouriteMode,
         inEditingMode,
     } = useContext(EventContext);
@@ -169,6 +171,13 @@ export default function Event({ id, title, description }) {
             const updatedEvents = events.filter((event) => event.id !== id);
             setEvents(updatedEvents);
             setShowEditModal(false);
+
+
+            // Also updating myEvents so that the UI updates
+            const updatedMyEvents = myEvents.filter((event) => event.id !== id);
+            setMyEvents(updatedMyEvents);
+            setShowEditModal(false);
+
             console.log("Event deleted successfully");
         } else {
             console.log("Failed to delete event from the database.");
