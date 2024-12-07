@@ -29,7 +29,6 @@ export async function updateEventNew(id, updatedEvent) {
         await updateDoc(docRef, {
             title: updatedEvent.title,
             description: updatedEvent.description,
-            isFavourite: updatedEvent.isFavourite,
             date: updatedEvent.date,
             time: updatedEvent.time,
         });

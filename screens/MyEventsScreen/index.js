@@ -177,10 +177,24 @@ export default function MyEventsScreen() {
         const result = await database.addEvent(newEvent, userId);
 
         if (result) {
-            const newEventWithId = { ...newEvent, id: result };
-            const updatedEvents = [...myEvents, newEventWithId];
-            setMyEvents(updatedEvents);
 
+            const result2 = await database.getEventsFromDb();
+
+            const dbEvents = result2.map((event) => ({
+                id: event.id,
+                authorId: event.authorId,
+                title: event.title,
+                description: event.description,
+                date: event.date,
+                time: event.time,
+            }));
+
+            setEvents(dbEvents);
+
+            const updatedMyEvents = dbEvents.filter(
+                (event) => event.authorId === authId
+            );
+            setMyEvents(updatedMyEvents);
 
             // Also updating the favourite events state in case it was added
             // to the users favourites upon creation
@@ -191,8 +205,6 @@ export default function MyEventsScreen() {
         } else {
             console.log("Failed to add to db.");
         }
-
-        //TODO add to personal my events list
     };
 
     const renderItem = ({ item }) => (

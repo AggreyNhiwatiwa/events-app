@@ -33,7 +33,7 @@ The Event item has a dynamic onPress action dependent on where in the app
 the item is rendered.
 */
 
-export default function Event({ id, title, description }) {
+export default function Event({ id, title, description, date, time }) {
     const {
         events,
         setEvents,
@@ -77,7 +77,18 @@ export default function Event({ id, title, description }) {
     */
     useEffect(() => {
         setEventIsFavourited(isEventFavourited(id));
-    }, [favouritedEvents, id]);
+    }, [myEvents, favouritedEvents, id]);
+
+    useEffect(() => {
+        setEventIsFavourited(isEventFavourited(id));
+        // Also updating myEvents so that the UI updates
+        if (authId) {
+            const initialMyEvents = events.filter(
+                (event) => event.authorId === authId
+            );
+            setMyEvents(initialMyEvents);
+        }
+    }, [events]);
 
     /* Handlers */
 
@@ -143,13 +154,41 @@ export default function Event({ id, title, description }) {
             date: selectedDate.toLocaleDateString(),
             time: selectedTime.toLocaleTimeString(),
             isFavourite: initFavourite,
+            authorId: authId,
         };
 
         const success = await database.updateEventNew(id, updatedEvent);
 
         if (success) {
-            const updatedEvents = [...events, { ...updatedEvent, id: success }];
-            setEvents(updatedEvents);
+            
+            // Setting myEvents from the db (as the operation is successful), and the events
+            // state update above is not yet ready
+            const result = await database.getEventsFromDb();
+
+            const dbEvents = result.map((event) => ({
+                id: event.id,
+                authorId: event.authorId,
+                title: event.title,
+                description: event.description,
+                date: event.date,
+                time: event.time,
+            }));
+
+            setEvents(dbEvents);
+
+            const updatedMyEvents = dbEvents.filter(
+                (event) => event.authorId === authId
+            );
+            setMyEvents(updatedMyEvents);
+
+            // Also need to trigger a re-render for the favourites, in case a favoruitedevent changes
+            // its properties
+            const userDocId = await database.getUserDocIdByAuthId(authId);
+            const initialFavouritedEvents = await database.getFavouritesForUser(userDocId);
+            setFavouritedEvents(initialFavouritedEvents);
+
+
+
             setShowEditModal(false);
         } else {
             console.log("Failed to add to db.");
@@ -171,7 +210,6 @@ export default function Event({ id, title, description }) {
             const updatedEvents = events.filter((event) => event.id !== id);
             setEvents(updatedEvents);
             setShowEditModal(false);
-
 
             // Also updating myEvents so that the UI updates
             const updatedMyEvents = myEvents.filter((event) => event.id !== id);
@@ -322,39 +360,31 @@ export default function Event({ id, title, description }) {
 
             <Modal visible={showEditModal} animationType="slide">
                 <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>Add Event</Text>
+                    <Text style={styles.modalTitle}>Edit Event</Text>
                     <TextInput
                         style={styles.inputContainer}
                         placeholder="Enter an event title"
                         maxLength={150}
                         onChangeText={handleTitleChange}
-                        defaultValue={eventTitle}
+                        defaultValue={title}
                     />
                     <TextInput
                         style={styles.inputContainer}
                         placeholder="Enter an event description"
                         maxLength={150}
                         onChangeText={handleDescriptionChange}
-                        defaultValue={eventDescription}
+                        defaultValue={description}
                     />
                     <DateTimePicker
                         value={selectedDate}
                         onChange={handleDateChange}
+                        defaultValue={date}
                     />
                     <DateTimePicker
                         mode="time"
                         value={selectedTime}
                         onChange={handleTimeChange}
                     />
-                    <View style={styles.switchContainer}>
-                        <Text style={styles.switchText}>
-                            Add to favourites?:
-                        </Text>
-                        <Switch
-                            value={initFavourite}
-                            onValueChange={handleInitFavouriteToggle}
-                        />
-                    </View>
                     <Pressable
                         style={styles.modalButton}
                         onPress={handleEditEvent}
