@@ -146,7 +146,6 @@ export default function LoginScreen({ setCredentials }) {
                 showSuccessToast("Account created successfully");
             })
             .catch((error) => {
-                console.error("Error signing up: ", error.message);
 
                 // Using prebuilt errors for use in Toast:
                 //https://firebase.google.com/docs/auth/admin/errors
@@ -307,6 +306,7 @@ export default function LoginScreen({ setCredentials }) {
                             <Text style={styles.modalButtonText}>Close</Text>
                         </Pressable>
                     </View>
+                    <Toast/>
                 </Modal>
 
                 <Modal animationType="slide" visible={showSignUpModal}>
@@ -351,6 +351,7 @@ export default function LoginScreen({ setCredentials }) {
                             <Text style={styles.modalButtonText}>Close</Text>
                         </Pressable>
                     </View>
+                    <Toast/>
                 </Modal>
             </View>
         </>
