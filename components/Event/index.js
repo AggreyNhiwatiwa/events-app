@@ -20,7 +20,7 @@ import {
 // Third party imports
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { parse } from "date-fns";
+import { parse, format } from "date-fns";
 
 // Project imports
 import styles from "./styles";
@@ -82,9 +82,11 @@ export default function Event({ id, title, description, date, time }) {
     */
     const dateAsDate = parse(date, "dd/MM/yyyy", new Date());
     const timeAsDate = parse(time, "HH:mm:ss", new Date());
-
     const [selectedDate, setSelectedDate] = useState(dateAsDate);
     const [selectedTime, setSelectedTime] = useState(timeAsDate);
+
+    // Formatting in 12hr format just for UI
+    const formattedTime = format(timeAsDate, "hh:mm a");
 
     /* 
     Helper function which checks whether the current element (from its Id)
@@ -182,7 +184,6 @@ export default function Event({ id, title, description, date, time }) {
         const success = await database.updateEventNew(id, updatedEvent);
 
         if (success) {
-            
             // Setting myEvents from the db (as the operation is successful), and the events
             // state update above is not yet ready
             const result = await database.getEventsFromDb();
@@ -206,10 +207,10 @@ export default function Event({ id, title, description, date, time }) {
             // Also need to trigger a re-render for the favourites, in case a favoruitedevent changes
             // its properties
             const userDocId = await database.getUserDocIdByAuthId(authId);
-            const initialFavouritedEvents = await database.getFavouritesForUser(userDocId);
+            const initialFavouritedEvents = await database.getFavouritesForUser(
+                userDocId
+            );
             setFavouritedEvents(initialFavouritedEvents);
-
-
 
             setShowEditModal(false);
         } else {
@@ -360,23 +361,18 @@ export default function Event({ id, title, description, date, time }) {
                 onPress={() => handleEventPress(id)}
             >
                 <View style={styles.leftContainer}>
-                    <MaterialCommunityIcons name={"calendar-month"} size={30} />
+                    <MaterialCommunityIcons
+                        name={eventIsFavourited ? "heart" : "heart-outline"}
+                        size={30}
+                    />
                 </View>
 
                 <View style={styles.rightContainer}>
                     <Text style={styles.mainHeading}>{title}</Text>
-                    <Text style={styles.subHeading}>{description}</Text>
-
-                    <Text
-                        style={[
-                            styles.subHeading,
-                            eventIsFavourited
-                                ? styles.availableText
-                                : styles.borrowedText,
-                        ]}
-                    >
-                        {eventIsFavourited ? "Favourite" : "Not favourite"}
+                    <Text style={styles.subHeading}>
+                        {date} @ {formattedTime}
                     </Text>
+                    <Text style={styles.subHeading}>{description}</Text>
                 </View>
             </Pressable>
 
