@@ -7,7 +7,7 @@ Lab 4
 
 /*
 The Firebase read functions for the Events collection
-Logging the Firebase errors for debugging
+Logging the Firebase errors for developer debugging
 */
 
 import {
@@ -19,29 +19,6 @@ import {
     query,
 } from "firebase/firestore";
 import { db } from "./config";
-
-/*
-Getting ID of a single Event
-*/
-export async function getEventId(data) {
-    let eventId;
-
-    try {
-        const dbCollection = collection(db, "events");
-
-        const query = query(dbCollection, where("title", "==", data.title));
-
-        const eventSnapshot = await getDocs(query);
-        eventSnapshot.forEach((event) => {
-            eventId = event.id;
-        });
-
-        return eventId;
-    } catch (error) {
-        console.log("Error getting the Event ID", error.message);
-        return null;
-    }
-}
 
 /*
 In this case gets all the Events from the database

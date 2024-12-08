@@ -5,25 +5,26 @@ INFO-6132
 Lab 4
 */
 
-/*
-Component that simply renders the list of Events from the Database
-*/
-import { FlatList, Text, View } from "react-native";
+// React imports
 import { useCallback, useContext } from "react";
-import styles from "./styles";
+import { FlatList, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+
+// Project imports
+import styles from "./styles";
 import { EventContext } from "../../context/EventContext";
 import Event from "../../components/Event";
-import Toast from "react-native-toast-message";
 
+/*
+Component that simply renders the list global of Events from the Database
+These events are shared by all users.
+useFocusEffect helps update the global state to ensure each event
+item has its correct onPress action
+*/
 export default function AllEventsScreen() {
     const { events, setInFavouriteMode, setInEditingMode } =
         useContext(EventContext);
 
-    /*
-  useFocusEffect hook to ensure that whenever the Events screen is navigated to, the
-  global boolean for inBorrowingMode is set to false
-  */
     useFocusEffect(
         useCallback(() => {
             setInFavouriteMode(false);

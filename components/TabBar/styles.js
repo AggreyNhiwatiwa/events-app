@@ -11,7 +11,7 @@ Styling for the custom TabBar (Bottom Tab Navigator)
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  tabbar: {
-    backgroundColor: "#1E3F5A",
-  },
+    tabbar: {
+        backgroundColor: "#1E3F5A",
+    },
 });

@@ -9,11 +9,16 @@ Lab 4
 The component that renders the bottom tab bar.
 */
 
-import styles from "./styles";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+// React imports
 import { useContext } from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+// Third party imports
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+// Project imports
 import { EventContext } from "../../context/EventContext";
+import styles from "./styles";
 import FavouriteEventsScreen from "../../screens/FavouriteEventsScreen";
 import MyEventsScreen from "../../screens/MyEventsScreen";
 import AllEventsScreen from "../../screens/AllEventsScreen";

@@ -7,6 +7,7 @@ Lab 4
 
 /*
 The Firebase write functions for the Events collection
+Logging the Firebase errors for developer debugging
 */
 
 import {
@@ -17,12 +18,14 @@ import {
     updateDoc,
     setDoc,
     arrayUnion,
-    arrayRemove
+    arrayRemove,
 } from "firebase/firestore";
 import { db } from "./config";
 
-
-export async function updateEventNew(id, updatedEvent) {
+/*
+Updating a specific event
+*/
+export async function updateEvent(id, updatedEvent) {
     try {
         const docRef = doc(db, "events", id);
 
@@ -41,6 +44,9 @@ export async function updateEventNew(id, updatedEvent) {
     }
 }
 
+/*
+Deleting a specific event
+*/
 export async function deleteEvent(id) {
     try {
         const docRef = doc(db, "events", id);
@@ -55,18 +61,16 @@ export async function deleteEvent(id) {
 }
 
 /*
-Adds a new event to the DB
-Also returns the ID of the newly added event
-
+Adds a new event to the db and returns its id
 If the event author initialises isFavourite to true, the method to
-add the event to the users favouriteEvents array is called
+add the event to the users favouriteEvents array is called to add
+it to the creators favourites list
 */
 export async function addEvent(newEvent, userId) {
     try {
         const collectionRef = collection(db, "events");
 
         const docRef = await addDoc(collectionRef, {
-            //id: newEvent.id,
             authorId: newEvent.authorId,
             title: newEvent.title,
             description: newEvent.description,
@@ -77,8 +81,7 @@ export async function addEvent(newEvent, userId) {
         // Updating the document to include its id in the db itself
         await updateDoc(docRef, { id: docRef.id });
 
-        if(newEvent.isFavourite){
-
+        if (newEvent.isFavourite) {
             await addFavouriteForUser(userId, docRef.id);
         }
 
@@ -91,26 +94,16 @@ export async function addEvent(newEvent, userId) {
 }
 
 /*
-Add new user to the "users" collection in the db
-This step also initialises the favourites subcollection for each specific user
-When making a subcollection, Firestore needs a document, hence an empty document is created here
-If this is also deleted, the whole subcollection will be also
-Therefore when getting a users favourites, the backend logic will keep the empty doument there 
-without it being involved in the business logic
+Adds a new user to the "users" collection in the db
 */
-export async function addUser(fullName, email, authId) {
+export async function addUser(email, authId) {
     try {
         const collectionRef = collection(db, "users");
 
         const docRef = await addDoc(collectionRef, {
             authId: authId,
-            fullName: fullName,
             email: email,
         });
-
-        //Id here as Id of the actual user document, not the auth id
-        const favouritesRef = doc(db, `users/${docRef.id}/favourites/emptyDoc`);
-        await setDoc(favouritesRef, {});
 
         console.log("New User successfully added with ID:", docRef.id);
         return docRef.id;
@@ -120,7 +113,6 @@ export async function addUser(fullName, email, authId) {
     }
 }
 
-
 /*
 Adding the given event to a given users favourites by adding the eventId to the 
 favouriteEvents property of the user.
@@ -128,38 +120,39 @@ arrayUnion from Firestore to add unique elements to an array property (which fav
 */
 export async function addFavouriteForUser(userId, eventId) {
     try {
-      const userRef = doc(db, "users", userId);
+        const userRef = doc(db, "users", userId);
 
-      await updateDoc(userRef, {
-        favoriteEvents: arrayUnion(eventId),
-      });
-  
-      console.log(`Event ${eventId} added to user ${userId}'s favorites.`);
-      return true;
+        await updateDoc(userRef, {
+            favoriteEvents: arrayUnion(eventId),
+        });
+
+        console.log(`Event ${eventId} added to user ${userId}'s favorites.`);
+        return true;
     } catch (error) {
-      console.error("Error adding favorite event:", error.message);
-      return false;
+        console.error("Error adding favorite event:", error.message);
+        return false;
     }
-  }
-  
+}
+
 /*
 The reverse of the addFavouriteUser function
 arrayRemove is the opposite of arrayUnion and allows specified elements to be removed from
 an array property, like favouriteEvents.
 */
-  export async function removeFavouriteForUser(userId, eventId) {
+export async function removeFavouriteForUser(userId, eventId) {
     try {
+        const userRef = doc(db, "users", userId);
 
-      const userRef = doc(db, "users", userId);
-  
-      await updateDoc(userRef, {
-        favoriteEvents: arrayRemove(eventId),
-      });
-  
-      console.log(`Event ${eventId} removed from user ${userId}'s favorites.`);
-      return true;
+        await updateDoc(userRef, {
+            favoriteEvents: arrayRemove(eventId),
+        });
+
+        console.log(
+            `Event ${eventId} removed from user ${userId}'s favorites.`
+        );
+        return true;
     } catch (error) {
-      console.error("Error removing favorite event:", error.message);
-      return false;
+        console.error("Error removing favorite event:", error.message);
+        return false;
     }
-  }
+}

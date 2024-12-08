@@ -1,20 +1,37 @@
-import styles from "./styles";
+/*
+Aggrey Nhiwatiwa
+1152301
+INFO-6132 
+Lab 4
+*/
+
+// React imports
 import { useContext, useEffect, useState } from "react";
-import { Button, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, Text, TextInput, View } from "react-native";
+
+// Third party imports
 import Toast from "react-native-toast-message";
+import { auth } from "../../database/config";
 import {
     createUserWithEmailAndPassword,
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signOut,
 } from "firebase/auth";
-import InputMsgBox from "../../components/InputMsgBox";
-import { auth } from "../../database/config";
+
+// Project imports
+import styles from "./styles";
 import { AuthContext } from "../../context/AuthContext";
 import * as database from "../../database";
+import InputMsgBox from "../../components/InputMsgBox";
 
+/*
+A component that uses Firebase Auth to allow users to sign up,
+sign in and even change their password for the events app.
+Regex is used to validate user emails and password inputs
+*/
 export default function LoginScreen({ setCredentials }) {
-    /* States */
+    /* State */
     const [email, setEmail] = useState("");
     const [pwd, setPwd] = useState("");
     const [emailErrTxt, setEmailErrTxt] = useState("");
@@ -25,16 +42,13 @@ export default function LoginScreen({ setCredentials }) {
         useState(true);
     const [emailIsValid, setEmailIsValid] = useState(false);
     const [pwdIsValid, setPwdIsValid] = useState(false);
-
-    const { isAuthenticated, setIsAuthenticated, authId, setAuthId } =
-        useContext(AuthContext);
-
     const [showSignUpModal, setShowSignUpModal] = useState(false);
     const [signUpBtnDisabled, setSignUpBtnDisabled] = useState(true);
+    const { setIsAuthenticated, setAuthId } = useContext(AuthContext);
 
     /*
-  Ensures that there are no active users signed in when the login page is entered
-  */
+    Ensures that there are no active users signed in when the login page is entered
+    */
     useEffect(() => {
         signOut(auth)
             .then(() => {
@@ -46,14 +60,13 @@ export default function LoginScreen({ setCredentials }) {
     }, []);
 
     /*
-  Tracks whenever the username or pwd changes and conducts the sanity check
-  */
+    Tracks whenever the username or pwd changes and conducts the sanity check
+    */
     useEffect(() => {
         updateLoginButtonState();
     }, [emailIsValid, pwdIsValid]);
 
     /* Handlers */
-
     const handleForgotPasswordPress = () => {
         handleModalToggle();
     };
@@ -67,9 +80,9 @@ export default function LoginScreen({ setCredentials }) {
     };
 
     /*
-  Sanity check for email
-  Regex pattern obtained via https://regexr.com/
-  */
+    Sanity check for email
+    Regex pattern obtained via https://regexr.com/
+    */
     const handleEmailChange = (value) => {
         setEmail(value);
 
@@ -103,18 +116,14 @@ export default function LoginScreen({ setCredentials }) {
     };
 
     /*
-  Attempts to sign user in to db
-  */
+    Attempts to sign user in to db
+    */
     const handleLoginPress = () => {
         signInWithEmailAndPassword(auth, email, pwd)
             .then((userCredential) => {
-                // Signed in
                 const user = userCredential.user;
-
-                //SetAuthId
                 setAuthId(user.uid);
                 setIsAuthenticated(true);
-
                 showSuccessToast("Login successful");
             })
             .catch(() => {
@@ -123,36 +132,28 @@ export default function LoginScreen({ setCredentials }) {
             });
     };
 
-    /*
-  Signs up a new user to make an account 
-  */
     const handleSignUpPress = () => {
         setShowSignUpModal();
     };
 
+    /*
+    When the sign up button is pressed, the input is validated
+    Then the errors from Firebase (if any) are displayed to the user
+    https://firebase.google.com/docs/auth/admin/errors
+
+    If successful, the new user is added to the "users" collection in the db.
+    And then the user is automatically logged in
+    */
     const handleSignUpConfirm = () => {
-        //When button pressed, input valid by means of regex
         createUserWithEmailAndPassword(auth, email, pwd)
             .then((userCredential) => {
                 const user = userCredential.user;
-
-                //Adding user to the "users" collection in the db
-                database.addUser("Test name", email, user.uid);
-
-                // Set context auths
+                database.addUser(email, user.uid);
                 setAuthId(user.uid);
                 setIsAuthenticated(true);
-
                 showSuccessToast("Account created successfully");
             })
             .catch((error) => {
-
-                // Using prebuilt errors for use in Toast:
-                //https://firebase.google.com/docs/auth/admin/errors
-                // No need for email format err, as handled by regex
-
-                //TODO, errs currently trigger expo errs also, see if this can be cirumvented
-
                 if (error.code === "auth/email-already-in-use") {
                     showErrorToast("The Email you entered is already in use.");
                 } else if (error.code === "auth/weak-password") {
@@ -162,16 +163,15 @@ export default function LoginScreen({ setCredentials }) {
                         "An error occured while signing up, please try again."
                     );
                 }
-
                 handlePwdChange("");
             });
     };
 
     /*
-  Sends a password reset email if the email is registered in the DB
-  Due to security, theres no way in Firebase to sanity check whether an email is in the DB 
-  before the request is made
-  */
+    Sends a password reset email if the email is registered in the DB
+    Due to security, theres no way in Firebase to sanity check whether an email is in the DB 
+    before the request is made
+    */
     const handleSendPasswordResetLink = () => {
         sendPasswordResetEmail(auth, email)
             .then(() => {
@@ -187,7 +187,7 @@ export default function LoginScreen({ setCredentials }) {
     /*
     Helper function for changing the login button state depending
     on whether the user input is valid
-  */
+    */
     const updateLoginButtonState = () => {
         if (emailIsValid && pwdIsValid) {
             setLoginBtnDisabled(false);
@@ -306,7 +306,7 @@ export default function LoginScreen({ setCredentials }) {
                             <Text style={styles.modalButtonText}>Close</Text>
                         </Pressable>
                     </View>
-                    <Toast/>
+                    <Toast />
                 </Modal>
 
                 <Modal animationType="slide" visible={showSignUpModal}>
@@ -351,7 +351,7 @@ export default function LoginScreen({ setCredentials }) {
                             <Text style={styles.modalButtonText}>Close</Text>
                         </Pressable>
                     </View>
-                    <Toast/>
+                    <Toast />
                 </Modal>
             </View>
         </>

@@ -5,17 +5,12 @@ INFO-6132
 Lab 4
 */
 
-/*
-Simply renders the list of events created by the currently logged in user.
-
-When an Event in this list is pressed, it allows it to be edited (this logic is handled in the Event component)
-
-The modal here is for adding and event, while the modal defined in Event is for editing a component
-*/
-
+// React imports
+import { useCallback, useContext, useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import {
     Alert,
-    Button,
     FlatList,
     Modal,
     Pressable,
@@ -25,22 +20,28 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { useCallback, useContext, useEffect } from "react";
-import styles from "./styles";
-import { useNavigation } from "@react-navigation/native";
-import { useFocusEffect } from "@react-navigation/native";
-import { EventContext } from "../../context/EventContext";
-import { AuthContext } from "../../context/AuthContext";
-import Event from "../../components/Event";
-import { useState } from "react";
+
+// Third party imports
+import { signOut } from "firebase/auth";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as database from "../../database";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Toast from "react-native-toast-message";
 
-import { signOut } from "firebase/auth";
+// Project imports
+import styles from "./styles";
+import { EventContext } from "../../context/EventContext";
+import { AuthContext } from "../../context/AuthContext";
+import Event from "../../components/Event";
+import * as database from "../../database";
 import { auth } from "../../database/config";
 
+/*
+Simply renders the list of events created by the currently logged in user.
+When an Event in this list is pressed, it allows it to be edited (this logic is handled in the Event component)
+The modal here is for adding and events, while the modal defined in Event is for editing a component.
+useFocusEffect helps update the global state to ensure each event
+item has its correct onPress action
+*/
 export default function MyEventsScreen() {
     const {
         events,
@@ -53,15 +54,21 @@ export default function MyEventsScreen() {
     } = useContext(EventContext);
     const navigation = useNavigation();
 
-    const { isAuthenticated, setIsAuthenticated, authId, setAuthId } =
-        useContext(AuthContext);
+    /* State */
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [initFavourite, setInitFavourite] = useState(false);
+    const [eventTitle, setEventTitle] = useState("");
+    const [eventDescription, setEventDescription] = useState("");
+    const [eventTitleIsValid, setEventTitleIsValid] = useState(false);
+    const [eventDescriptionIsValid, setEventDescriptionIsValid] =
+        useState(false);
+    const [titleErrTxt, setTitleErrTxt] = useState("");
+    const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
+    const [date, setDate] = useState(new Date());
+    const [time, setTime] = useState(new Date());
+    const { setIsAuthenticated, authId, setAuthId } = useContext(AuthContext);
 
-    /*
-    useFocusEffect hook to ensure that whenever MyScreen is navigated to, the
-    global boolean for inEditingMode is set to true, as only the event author can
-    edit or delete posts authored by themselves. This allows event UI items to have
-    favourite specific onPress actions.
-    */
+    /* Side effects */
     useFocusEffect(
         useCallback(() => {
             setInEditingMode(true);
@@ -111,7 +118,7 @@ export default function MyEventsScreen() {
         }, [])
     );
 
-    //TODO: Add success/err toasts here
+    /* Handlers */
     const handleLogout = () => {
         signOut(auth)
             .then(() => {
@@ -126,18 +133,6 @@ export default function MyEventsScreen() {
             });
     };
 
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [initFavourite, setInitFavourite] = useState(false);
-    const [eventTitle, setEventTitle] = useState("");
-    const [eventDescription, setEventDescription] = useState("");
-    const [eventTitleIsValid, setEventTitleIsValid] = useState(false);
-    const [eventDescriptionIsValid, setEventDescriptionIsValid] =
-        useState(false);
-    const [titleErrTxt, setTitleErrTxt] = useState("");
-    const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
-    const [date, setDate] = useState(new Date());
-    const [time, setTime] = useState(new Date());
-
     const handleShowAddModal = () => {
         setShowAddModal(true);
     };
@@ -146,14 +141,19 @@ export default function MyEventsScreen() {
         setShowAddModal(false);
     };
 
-    //Setting show modal as opposite in UI
     const handleInitFavouriteToggle = () => {
         setInitFavourite(!initFavourite);
     };
 
-    /*
-    Sanity check for title 
-    */
+    const handleDateChange = (event, selectedDate) => {
+        setDate(selectedDate);
+    };
+
+    const handleTimeChange = (event, selectedTime) => {
+        setTime(selectedTime);
+    };
+
+    /* Sanity checks */
     const handleTitleChange = (value) => {
         setEventTitle(value);
 
@@ -178,22 +178,13 @@ export default function MyEventsScreen() {
         }
     };
 
-    const handleDateChange = (event, selectedDate) => {
-        setDate(selectedDate);
-    };
-
-    const handleTimeChange = (event, selectedTime) => {
-        setTime(selectedTime);
-    };
-
     /*
-    Adding the new event to the DB
-    Gets authorId from global context
+    When add is pressed, there is input validation to make sure that
+    all fields have been set.
+    If so, this is created in the db.
     */
     const handleAddNewEvent = async () => {
-
-        if(eventTitle.trim() === "" || eventDescription.trim() === ""){
-
+        if (eventTitle.trim() === "" || eventDescription.trim() === "") {
             Alert.alert(
                 "Required fields missing",
                 `Please ensure all fields are filled out.`,
@@ -201,7 +192,6 @@ export default function MyEventsScreen() {
             );
 
             return;
-
         }
 
         Alert.alert(
@@ -232,9 +222,9 @@ export default function MyEventsScreen() {
                         );
 
                         if (result) {
-                            const result2 = await database.getEventsFromDb();
+                            const newResult = await database.getEventsFromDb();
 
-                            const dbEvents = result2.map((event) => ({
+                            const dbEvents = newResult.map((event) => ({
                                 id: event.id,
                                 authorId: event.authorId,
                                 title: event.title,
@@ -242,7 +232,6 @@ export default function MyEventsScreen() {
                                 date: event.date,
                                 time: event.time,
                             }));
-
                             setEvents(dbEvents);
 
                             const updatedMyEvents = dbEvents.filter(
@@ -250,8 +239,6 @@ export default function MyEventsScreen() {
                             );
                             setMyEvents(updatedMyEvents);
 
-                            // Also updating the favourite events state in case it was added
-                            // to the users favourites upon creation
                             const updatedFavourites =
                                 await database.getFavouritesForUser(userId);
                             setFavouritedEvents(updatedFavourites);
@@ -374,10 +361,9 @@ export default function MyEventsScreen() {
                         style={styles.modalButton}
                         onPress={handleAddNewEvent}
                     >
-                        <Text style={styles.modalButtonText}>ADD</Text>
+                        <Text style={styles.modalButtonText}>Add</Text>
                     </Pressable>
                 </View>
-                
             </Modal>
         </>
     );

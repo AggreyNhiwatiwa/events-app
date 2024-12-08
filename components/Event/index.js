@@ -5,7 +5,7 @@ INFO-6132
 Lab 4
 */
 
-// First party imports
+// React imports
 import { useContext, useEffect, useState } from "react";
 import {
     Alert,
@@ -34,7 +34,6 @@ Component that renders an Event item using database data.
 The Event item has a dynamic onPress action dependent on where in the app
 the item is rendered.
 */
-
 export default function Event({ id, title, description, date, time }) {
     const {
         events,
@@ -48,7 +47,7 @@ export default function Event({ id, title, description, date, time }) {
     } = useContext(EventContext);
     const { authId } = useContext(AuthContext);
 
-    //State
+    /* State */
     const [showEditModal, setShowEditModal] = useState(false);
     const [initFavourite, setInitFavourite] = useState(false);
     const [eventTitle, setEventTitle] = useState(title);
@@ -58,7 +57,6 @@ export default function Event({ id, title, description, date, time }) {
         useState(false);
     const [titleErrTxt, setTitleErrTxt] = useState("");
     const [descriptionErrTxt, setDescriptionErrTxt] = useState("");
-    const [initialDate, setInitialDate] = useState(date);
     const [eventIsFavourited, setEventIsFavourited] = useState(null);
 
     /*
@@ -86,28 +84,28 @@ export default function Event({ id, title, description, date, time }) {
     const [selectedDate, setSelectedDate] = useState(dateAsDate);
     const [selectedTime, setSelectedTime] = useState(timeAsDate);
 
-    // Formatted time for the UI
+    /*
+    Formatting date (to a short format) and time in a 12h 
+    format just for the UI
+    */
     const formattedDate = format(dateAsDate, "MMM dd");
     const [month, day] = formattedDate.split(" ");
-
-    // Formatting in 12hr format just for UI
     const formattedTime = format(timeAsDate, "hh:mm a");
 
-    /* 
-    Helper function which checks whether the current element (from its Id)
-    exists in the local list of favourite events
+    /* Side Effects */
+
+    /*
+    Whenever the list of favourites or the current event (id) changes, 
+    the boolean evaluation on whether it is a favourite or not, using
+    a helper function. This triggers the local state to update the UI.
     */
+
     const isEventFavourited = (eventIdToCheck) => {
         return favouritedEvents.some(
             (favEvent) => favEvent.id === eventIdToCheck
         );
     };
 
-    /*
-    Whenever the list of favourites or the current event (id) changes, 
-    the boolean evaluation on whether it is a favourite or not from the 
-    local state is triggered to update the UI
-    */
     useEffect(() => {
         setEventIsFavourited(isEventFavourited(id));
     }, [myEvents, favouritedEvents, id]);
@@ -125,7 +123,6 @@ export default function Event({ id, title, description, date, time }) {
 
     /* Handlers */
 
-    // Add and Edit handlers
     const handleShowEditModal = () => {
         setShowEditModal(true);
     };
@@ -158,8 +155,11 @@ export default function Event({ id, title, description, date, time }) {
         }
     };
 
-    // The event parameter here is a placeholder, as the
-    // second argument must be a date object per the documentation
+    /*
+    The event parameter here is a placeholder, as the second argument
+    must be a date object per the documentation:
+    https://github.com/react-native-datetimepicker/datetimepicker
+    */
     const handleDateChange = (event, selectedDate) => {
         setSelectedDate(selectedDate);
     };
@@ -173,13 +173,16 @@ export default function Event({ id, title, description, date, time }) {
     /*
     Creates a local Event object with values from the modal and then 
     updates the currently edited item with these updated values.
-    As the database is the source of truth, the local state is only
+    As the database is the source of truth (SOT), the local state is only
     updates when the update is successful in the database.
+
+    In the success block, myEvents and favourites update their state from the
+    database, as the database is the SOT and the async react state updates for 
+    the edited event has not completed yet. Therefore this always triggers a rerender 
+    with the correct values.
     */
     const handleEditEvent = async () => {
-
-        if(eventTitle.trim() === "" || eventDescription.trim() === ""){
-
+        if (eventTitle.trim() === "" || eventDescription.trim() === "") {
             Alert.alert(
                 "Required fields missing",
                 `Please ensure all fields are filled out.`,
@@ -187,7 +190,6 @@ export default function Event({ id, title, description, date, time }) {
             );
 
             return;
-
         }
 
         Alert.alert(
@@ -210,16 +212,13 @@ export default function Event({ id, title, description, date, time }) {
                             authorId: authId,
                         };
 
-                        const success = await database.updateEventNew(
+                        const success = await database.updateEvent(
                             id,
                             updatedEvent
                         );
 
                         if (success) {
-                            // Setting myEvents from the db (as the operation is successful), and the events
-                            // state update above is not yet ready
                             const result = await database.getEventsFromDb();
-
                             const dbEvents = result.map((event) => ({
                                 id: event.id,
                                 authorId: event.authorId,
@@ -228,7 +227,6 @@ export default function Event({ id, title, description, date, time }) {
                                 date: event.date,
                                 time: event.time,
                             }));
-
                             setEvents(dbEvents);
 
                             const updatedMyEvents = dbEvents.filter(
@@ -236,8 +234,6 @@ export default function Event({ id, title, description, date, time }) {
                             );
                             setMyEvents(updatedMyEvents);
 
-                            // Also need to trigger a re-render for the favourites, in case a favoruitedevent changes
-                            // its properties
                             const userDocId =
                                 await database.getUserDocIdByAuthId(authId);
                             const initialFavouritedEvents =
@@ -259,8 +255,7 @@ export default function Event({ id, title, description, date, time }) {
     /*
     Removes an event from the global events list.
     Note that as this method is only active in the MyEvents list (which filters events
-    made by the current user), by design no additional checks are needed for editing/deleting 
-    authorisation
+    made by the current user upon app sign in), so additional write checks are not needed.
     */
     const handleDeleteEvent = async () => {
         Alert.alert(
@@ -300,17 +295,18 @@ export default function Event({ id, title, description, date, time }) {
             ]
         );
     };
+
     /*
     Event press handler with dynamic events:
 
-    If on the Events screen: Pressing an event will show an alert. If the event is already
-    in the users favourites a one button alert will inform the user of this. If the event 
-    is not a favourite, the user has the option to add it.
+        -   If on the Events screen: Pressing an event will show an alert. If the event is already
+            in the users favourites a one button alert will inform the user of this. If the event 
+            is not a favourite, the user has the option to add it.
 
-    If on the Favourites screen: Pressing an event shows an alert which enables a user to 
-    unfavourite an Event. 
+        -   If on the Favourites screen: Pressing an event shows an alert which enables a user to 
+            unfavourite an Event. 
 
-    If on the MyEvents screen: Pressing an event brings up a modal to edit or delete an event.
+        -   If on the MyEvents screen: Pressing an event brings up a modal to edit or delete an event.
     */
     const handleEventPress = () => {
         if (inEditingMode) {
@@ -364,8 +360,8 @@ export default function Event({ id, title, description, date, time }) {
     };
 
     /*
-    Adding an event to a users favourites in thebefore updating the local state, using
-    the database as the source of truth.
+    Adding an event to a users favourites in therefore updating the local state,
+    using the database as the source of truth.
     */
     const handleAddToFavourites = async () => {
         try {
@@ -391,8 +387,8 @@ export default function Event({ id, title, description, date, time }) {
     };
 
     /*
-    Adding an event to a users favourites in the db before updating the local state, using
-    the database as the source of truth.
+    Adding an event to a users favourites in the db before updating the local state,
+    using the database as the source of truth.
     */
     const handleRemoveFromFavourites = async () => {
         try {
@@ -434,7 +430,7 @@ export default function Event({ id, title, description, date, time }) {
             type: "error",
             text1: "Error 🛑",
             text2: errMsg,
-            visibilityTime: 2200,   
+            visibilityTime: 2200,
             topOffset: 60,
         });
     };

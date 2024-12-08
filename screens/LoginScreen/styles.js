@@ -1,4 +1,11 @@
 /*
+Aggrey Nhiwatiwa
+1152301
+INFO-6132 
+Lab 4
+*/
+
+/*
 Styles for the LoginScreen component
 */
 import { StyleSheet } from "react-native";
@@ -38,7 +45,6 @@ const styles = StyleSheet.create({
         zIndex: -1,
         alignItems: "center",
     },
-
     modalButton: {
         backgroundColor: "#1E3F5A",
         margin: 10,
@@ -53,13 +59,11 @@ const styles = StyleSheet.create({
         opacity: 0.4,
     },
     loginButton: {
-        //marginTop: 50,
         backgroundColor: "green",
     },
     closeButton: {
-      //marginTop: 50,
-      backgroundColor: "#B5271D",
-  },
+        backgroundColor: "#B5271D",
+    },
     signupButton: {
         marginTop: 50,
         backgroundColor: "#000000",

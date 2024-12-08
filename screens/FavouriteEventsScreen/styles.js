@@ -6,31 +6,31 @@ Lab 4
 */
 
 /*
-Styles for the Favourited eventss screen
+Styles for the Favourited events screen
 */
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-  },
-  flatListContent: {
-    flexGrow: 1,
-  },
-  infoBar: {
-    alignItems: "center",
-    backgroundColor: "#1E3F5A",
-    width: 400,
-    height: 40,
-    justifyContent: "center",
-    marginBottom: 0,
-    borderWidth: 0,
-  },
-  infoBarText: {
-    color: "#FFE733",
-    fontStyle: "italic",
-  },
+    container: {
+        flex: 1,
+        alignItems: "center",
+    },
+    flatListContent: {
+        flexGrow: 1,
+    },
+    infoBar: {
+        alignItems: "center",
+        backgroundColor: "#1E3F5A",
+        width: 400,
+        height: 40,
+        justifyContent: "center",
+        marginBottom: 0,
+        borderWidth: 0,
+    },
+    infoBarText: {
+        color: "#FFE733",
+        fontStyle: "italic",
+    },
 });
 
 export default styles;

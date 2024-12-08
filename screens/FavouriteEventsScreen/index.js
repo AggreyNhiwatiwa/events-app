@@ -5,27 +5,25 @@ INFO-6132
 Lab 4
 */
 
-/*
-Simply renders the list of favourited events.
-Similar logic to the all events screen, but only gets the favourite events from the context
-*/
-import { FlatList, Text, View } from "react-native";
+// React imports
 import { useCallback, useContext } from "react";
-import styles from "./styles";
+import { FlatList, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+
+// Project imports
+import styles from "./styles";
 import { EventContext } from "../../context/EventContext";
 import Event from "../../components/Event";
-import Toast from "react-native-toast-message";
 
+/*
+Component that simply renders the favourites list of a specific user.
+useFocusEffect helps update the global state to ensure each event
+item has its correct onPress action
+*/
 export default function FavouriteEventsScreen() {
-    const { events, favouritedEvents, setInFavouriteMode, setInEditingMode } =
+    const { favouritedEvents, setInFavouriteMode, setInEditingMode } =
         useContext(EventContext);
 
-    /*
-  useFocusEffect hook to ensure that whenever the FavouritesScreen is navigated to, the
-  global boolean for inFavouriteMode is set to true, which allows event UI items to have
-  favourite specific onPress actions
-  */
     useFocusEffect(
         useCallback(() => {
             setInFavouriteMode(true);

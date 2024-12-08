@@ -6,7 +6,7 @@ Lab 4
 */
 
 /*
-Styling for each individual Book component
+Styling for each individual Event component
 */
 import { StyleSheet } from "react-native";
 
@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         alignItems: "center",
         justifyContent: "space-around",
-        // backgroundColor: "#FCF5E5",
         borderWidth: 1.2,
         borderRadius: 6,
     },
