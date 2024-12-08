@@ -47,8 +47,13 @@ const styles = StyleSheet.create({
         height: "90%",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#D3D3D3",
+        backgroundColor: "#1E3F5A",
         borderRadius: 4,
+    },
+    dateBoxText: {
+        fontSize: "18",
+        fontWeight: "600",
+        color: "#FFFFFF",
     },
     mainHeading: {
         fontSize: "22",
@@ -56,7 +61,7 @@ const styles = StyleSheet.create({
     },
     subHeading: {
         fontSize: "18",
-        fontWeight: "1000",
+        fontWeight: "400",
         color: "#5C5C5C",
     },
     descriptionHeading: {

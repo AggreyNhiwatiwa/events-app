@@ -21,6 +21,7 @@ import {
     Switch,
     Text,
     TextInput,
+    TouchableOpacity,
     View,
 } from "react-native";
 import { useCallback, useContext, useEffect } from "react";
@@ -33,6 +34,7 @@ import Event from "../../components/Event";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as database from "../../database";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { signOut } from "firebase/auth";
 import { auth } from "../../database/config";
@@ -68,18 +70,28 @@ export default function MyEventsScreen() {
     useEffect(() => {
         navigation.setOptions({
             headerLeft: () => (
-                <Button
+                <TouchableOpacity
                     onPress={handleLogout}
-                    title="Log Out"
-                    color="#FFFFFF"
-                />
+                    style={{ marginLeft: 15 }}
+                >
+                    <MaterialCommunityIcons
+                        name="logout"
+                        size={30}
+                        color="#FFE733"
+                    />
+                </TouchableOpacity>
             ),
             headerRight: () => (
-                <Button
+                <TouchableOpacity
                     onPress={handleShowAddModal}
-                    title="Add"
-                    color="#FFFFFF"
-                />
+                    style={{ marginRight: 15 }}
+                >
+                    <MaterialCommunityIcons
+                        name="plus"
+                        size={30}
+                        color="#FFE733"
+                    />
+                </TouchableOpacity>
             ),
         });
     }, [navigation]);
@@ -177,7 +189,6 @@ export default function MyEventsScreen() {
         const result = await database.addEvent(newEvent, userId);
 
         if (result) {
-
             const result2 = await database.getEventsFromDb();
 
             const dbEvents = result2.map((event) => ({
@@ -198,7 +209,9 @@ export default function MyEventsScreen() {
 
             // Also updating the favourite events state in case it was added
             // to the users favourites upon creation
-            const updatedFavourites = await database.getFavouritesForUser(userId);
+            const updatedFavourites = await database.getFavouritesForUser(
+                userId
+            );
             setFavouritedEvents(updatedFavourites);
 
             setShowAddModal(false);

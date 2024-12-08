@@ -366,15 +366,14 @@ export default function Event({ id, title, description, date, time }) {
             >
                 <View style={styles.leftContainer}>
                     <View style={styles.dateBox}>
-                    <Text style={styles.subHeading}>{month}</Text>
-                    <Text style={styles.subHeading}>{day}</Text>
+                    <Text style={styles.dateBoxText}>{month}</Text>
+                    <Text style={styles.dateBoxText}>{day}</Text>
                     </View>
 
                 </View>
 
                 <View style={styles.centreContainer}>
                     <Text style={styles.mainHeading}>{title}</Text>
-
                     <Text style={styles.subHeading}>{formattedTime}</Text>
                     <Text style={styles.descriptionHeading}>{description}</Text>
                 </View>
