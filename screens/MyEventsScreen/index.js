@@ -14,6 +14,7 @@ The modal here is for adding and event, while the modal defined in Event is for 
 */
 
 import {
+    Alert,
     Button,
     FlatList,
     Modal,
@@ -177,47 +178,66 @@ export default function MyEventsScreen() {
     Gets authorId from global context
     */
     const handleAddNewEvent = async () => {
-        const newEvent = {
-            title: eventTitle,
-            description: eventDescription,
-            date: date.toLocaleDateString(),
-            time: time.toLocaleTimeString(),
-            isFavourite: initFavourite,
-            authorId: authId,
-        };
-        const userId = await database.getUserDocIdByAuthId(authId);
-        const result = await database.addEvent(newEvent, userId);
+        Alert.alert(
+            "Add Event",
+            `Are you sure you want to add the event "${eventTitle}"?`,
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "OK",
+                    onPress: async () => {
+                        const newEvent = {
+                            title: eventTitle,
+                            description: eventDescription,
+                            date: date.toLocaleDateString(),
+                            time: time.toLocaleTimeString(),
+                            isFavourite: initFavourite,
+                            authorId: authId,
+                        };
+                        const userId = await database.getUserDocIdByAuthId(
+                            authId
+                        );
+                        const result = await database.addEvent(
+                            newEvent,
+                            userId
+                        );
 
-        if (result) {
-            const result2 = await database.getEventsFromDb();
+                        if (result) {
+                            const result2 = await database.getEventsFromDb();
 
-            const dbEvents = result2.map((event) => ({
-                id: event.id,
-                authorId: event.authorId,
-                title: event.title,
-                description: event.description,
-                date: event.date,
-                time: event.time,
-            }));
+                            const dbEvents = result2.map((event) => ({
+                                id: event.id,
+                                authorId: event.authorId,
+                                title: event.title,
+                                description: event.description,
+                                date: event.date,
+                                time: event.time,
+                            }));
 
-            setEvents(dbEvents);
+                            setEvents(dbEvents);
 
-            const updatedMyEvents = dbEvents.filter(
-                (event) => event.authorId === authId
-            );
-            setMyEvents(updatedMyEvents);
+                            const updatedMyEvents = dbEvents.filter(
+                                (event) => event.authorId === authId
+                            );
+                            setMyEvents(updatedMyEvents);
 
-            // Also updating the favourite events state in case it was added
-            // to the users favourites upon creation
-            const updatedFavourites = await database.getFavouritesForUser(
-                userId
-            );
-            setFavouritedEvents(updatedFavourites);
+                            // Also updating the favourite events state in case it was added
+                            // to the users favourites upon creation
+                            const updatedFavourites =
+                                await database.getFavouritesForUser(userId);
+                            setFavouritedEvents(updatedFavourites);
 
-            setShowAddModal(false);
-        } else {
-            console.log("Failed to add to db.");
-        }
+                            setShowAddModal(false);
+                        } else {
+                            console.log("Failed to add to db.");
+                        }
+                    },
+                },
+            ]
+        );
     };
 
     const renderItem = ({ item }) => (

@@ -176,52 +176,68 @@ export default function Event({ id, title, description, date, time }) {
     updates when the update is successful in the database.
     */
     const handleEditEvent = async () => {
-        const updatedEvent = {
-            title: eventTitle,
-            description: eventDescription,
-            date: selectedDate.toLocaleDateString(),
-            time: selectedTime.toLocaleTimeString(),
-            isFavourite: initFavourite,
-            authorId: authId,
-        };
+        Alert.alert(
+            "Edit Event",
+            `Are you sure you want to edit the event "${eventTitle}"?`,
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "OK",
+                    onPress: async () => {
+                        const updatedEvent = {
+                            title: eventTitle,
+                            description: eventDescription,
+                            date: selectedDate.toLocaleDateString(),
+                            time: selectedTime.toLocaleTimeString(),
+                            isFavourite: initFavourite,
+                            authorId: authId,
+                        };
 
-        const success = await database.updateEventNew(id, updatedEvent);
+                        const success = await database.updateEventNew(
+                            id,
+                            updatedEvent
+                        );
 
-        if (success) {
-            // Setting myEvents from the db (as the operation is successful), and the events
-            // state update above is not yet ready
-            const result = await database.getEventsFromDb();
+                        if (success) {
+                            // Setting myEvents from the db (as the operation is successful), and the events
+                            // state update above is not yet ready
+                            const result = await database.getEventsFromDb();
 
-            const dbEvents = result.map((event) => ({
-                id: event.id,
-                authorId: event.authorId,
-                title: event.title,
-                description: event.description,
-                date: event.date,
-                time: event.time,
-            }));
+                            const dbEvents = result.map((event) => ({
+                                id: event.id,
+                                authorId: event.authorId,
+                                title: event.title,
+                                description: event.description,
+                                date: event.date,
+                                time: event.time,
+                            }));
 
-            setEvents(dbEvents);
+                            setEvents(dbEvents);
 
-            const updatedMyEvents = dbEvents.filter(
-                (event) => event.authorId === authId
-            );
-            setMyEvents(updatedMyEvents);
+                            const updatedMyEvents = dbEvents.filter(
+                                (event) => event.authorId === authId
+                            );
+                            setMyEvents(updatedMyEvents);
 
-            // Also need to trigger a re-render for the favourites, in case a favoruitedevent changes
-            // its properties
-            const userDocId = await database.getUserDocIdByAuthId(authId);
-            const initialFavouritedEvents = await database.getFavouritesForUser(
-                userDocId
-            );
-            setFavouritedEvents(initialFavouritedEvents);
+                            // Also need to trigger a re-render for the favourites, in case a favoruitedevent changes
+                            // its properties
+                            const userDocId =
+                                await database.getUserDocIdByAuthId(authId);
+                            const initialFavouritedEvents =
+                                await database.getFavouritesForUser(userDocId);
+                            setFavouritedEvents(initialFavouritedEvents);
 
-            setShowEditModal(false);
-        } else {
-            console.log("Failed to add to db.");
-        }
-
-        //TODO: add to personal my events list if needed
+                            setShowEditModal(false);
+                        } else {
+                            console.log("Failed to add to db.");
+                        }
+                    },
+                },
+            ]
+        );
     };
 
     /*
@@ -231,22 +247,43 @@ export default function Event({ id, title, description, date, time }) {
     authorisation
     */
     const handleDeleteEvent = async () => {
-        const result = await database.deleteEvent(id);
+        Alert.alert(
+            "Delete Event",
+            `Are you sure you want to delete the event "${eventTitle}"?`,
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "OK",
+                    onPress: async () => {
+                        const result = await database.deleteEvent(id);
 
-        if (result) {
-            const updatedEvents = events.filter((event) => event.id !== id);
-            setEvents(updatedEvents);
-            setShowEditModal(false);
+                        if (result) {
+                            const updatedEvents = events.filter(
+                                (event) => event.id !== id
+                            );
+                            setEvents(updatedEvents);
+                            setShowEditModal(false);
 
-            // Also updating myEvents so that the UI updates
-            const updatedMyEvents = myEvents.filter((event) => event.id !== id);
-            setMyEvents(updatedMyEvents);
-            setShowEditModal(false);
+                            // Also updating myEvents so that the UI updates
+                            const updatedMyEvents = myEvents.filter(
+                                (event) => event.id !== id
+                            );
+                            setMyEvents(updatedMyEvents);
+                            setShowEditModal(false);
 
-            console.log("Event deleted successfully");
-        } else {
-            console.log("Failed to delete event from the database.");
-        }
+                            console.log("Event deleted successfully");
+                        } else {
+                            console.log(
+                                "Failed to delete event from the database."
+                            );
+                        }
+                    },
+                },
+            ]
+        );
     };
     /*
     Event press handler with dynamic events:
@@ -435,13 +472,13 @@ export default function Event({ id, title, description, date, time }) {
                         style={styles.modalButton}
                         onPress={handleEditEvent}
                     >
-                        <Text style={styles.modalButtonText}>Edit</Text>
+                        <Text style={styles.modalButtonText}>EDIT</Text>
                     </Pressable>
                     <Pressable
                         style={[styles.modalButton, styles.deleteButton]}
                         onPress={handleDeleteEvent}
                     >
-                        <Text style={styles.modalButtonText}>Delete</Text>
+                        <Text style={styles.modalButtonText}>DELETE</Text>
                     </Pressable>
                 </View>
             </Modal>
