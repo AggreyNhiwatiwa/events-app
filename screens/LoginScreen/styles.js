@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         zIndex: -2, //Needed so that outer toast shows above footer
     },
     modalView: {
+        backgroundColor: "rgba(255, 231, 51, 0.5)",
         alignSelf: "stretch",
         marginTop: 150,
         margin: 20,
@@ -55,9 +56,13 @@ const styles = StyleSheet.create({
         //marginTop: 50,
         backgroundColor: "green",
     },
-    forgotPasswordButton: {
+    closeButton: {
+      //marginTop: 50,
+      backgroundColor: "#B5271D",
+  },
+    signupButton: {
         marginTop: 50,
-        backgroundColor: "gray",
+        backgroundColor: "#000000",
     },
     deleteButton: {
         backgroundColor: "red",

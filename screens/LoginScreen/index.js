@@ -262,7 +262,7 @@ export default function LoginScreen({ setCredentials }) {
                 </Pressable>
 
                 <Pressable
-                    style={[styles.modalButton, styles.forgotPasswordButton]}
+                    style={[styles.modalButton, styles.signupButton]}
                     onPress={handleSignUpPress}
                 >
                     <Text style={styles.modalButtonText}>Sign up</Text>
@@ -285,16 +285,27 @@ export default function LoginScreen({ setCredentials }) {
 
                         <InputMsgBox text={emailErrTxt}></InputMsgBox>
 
-                        <Button
-                            title="Send Password Reset Link"
-                            onClick={handleSendPasswordResetLink}
+                        <Pressable
+                            style={[
+                                styles.modalButton,
+                                styles.loginButton,
+                                passwordResetBtnDisabled &&
+                                    styles.disabledButton,
+                            ]}
+                            onPress={handleSendPasswordResetLink}
                             disabled={passwordResetBtnDisabled}
-                        ></Button>
+                        >
+                            <Text style={styles.modalButtonText}>
+                                Request Reset
+                            </Text>
+                        </Pressable>
 
-                        <Button
-                            title="Close"
+                        <Pressable
+                            style={[styles.modalButton, styles.closeButton]}
                             onPress={handleModalToggle}
-                        ></Button>
+                        >
+                            <Text style={styles.modalButtonText}>Close</Text>
+                        </Pressable>
                     </View>
                 </Modal>
 
@@ -321,16 +332,24 @@ export default function LoginScreen({ setCredentials }) {
 
                         <InputMsgBox text={pwdErrTxt}></InputMsgBox>
 
-                        <Button
-                            title="Sign up"
+                        <Pressable
+                            style={[
+                                styles.modalButton,
+                                styles.loginButton,
+                                signUpBtnDisabled && styles.disabledButton,
+                            ]}
                             onPress={handleSignUpConfirm}
                             disabled={signUpBtnDisabled}
-                        ></Button>
+                        >
+                            <Text style={styles.modalButtonText}>Sign Up</Text>
+                        </Pressable>
 
-                        <Button
-                            title="Close"
+                        <Pressable
+                            style={[styles.modalButton, styles.closeButton]}
                             onPress={handleSignUpModalToggle}
-                        ></Button>
+                        >
+                            <Text style={styles.modalButtonText}>Close</Text>
+                        </Pressable>
                     </View>
                 </Modal>
             </View>
