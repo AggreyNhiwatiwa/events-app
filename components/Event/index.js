@@ -19,6 +19,7 @@ import {
 
 // Third party imports
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Toast from "react-native-toast-message";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { parse, format } from "date-fns";
 
@@ -229,10 +230,12 @@ export default function Event({ id, title, description, date, time }) {
                             const initialFavouritedEvents =
                                 await database.getFavouritesForUser(userDocId);
                             setFavouritedEvents(initialFavouritedEvents);
-
                             setShowEditModal(false);
+                            showSuccessToast("Event edited.");
                         } else {
-                            console.log("Failed to add to db.");
+                            showErrorToast(
+                                "Failed to edit event. Please try again."
+                            );
                         }
                     },
                 },
@@ -273,11 +276,10 @@ export default function Event({ id, title, description, date, time }) {
                             );
                             setMyEvents(updatedMyEvents);
                             setShowEditModal(false);
-
-                            console.log("Event deleted successfully");
+                            showSuccessToast("Event deleted.");
                         } else {
-                            console.log(
-                                "Failed to delete event from the database."
+                            showErrorToast(
+                                "Failed to delete event. Please try again."
                             );
                         }
                     },
@@ -362,12 +364,16 @@ export default function Event({ id, title, description, date, time }) {
                 const updatedFavourites = [...favouritedEvents, currEvent];
                 setFavouritedEvents(updatedFavourites);
                 setEventIsFavourited(true);
-                console.log("Event added successfully");
+                showSuccessToast("Event added to favourites.");
             } else {
-                console.error("Failed to add event to favourites.");
+                showErrorToast(
+                    "Failed to add event to favourites. Please try again."
+                );
             }
         } catch (error) {
-            console.error("Error adding event to favourites:", error);
+            showErrorToast(
+                "Failed to add event to favourites. Please try again."
+            );
         }
     };
 
@@ -386,13 +392,40 @@ export default function Event({ id, title, description, date, time }) {
                 );
                 setFavouritedEvents(updatedFavourites);
                 setEventIsFavourited(false);
-                console.log("Event deleted successfully");
+                showSuccessToast("Event removed from favourites.");
             } else {
-                console.log("Failed to delete event from the database.");
+                showErrorToast(
+                    "Failed to remove event from favourites. Please try again."
+                );
             }
         } catch (error) {
-            console.error("Error adding event to favourites:", error);
+            showErrorToast(
+                "Failed to remove event from favourites. Please try again."
+            );
         }
+    };
+
+    /* Toast logic */
+    const showSuccessToast = (msg) => {
+        Toast.show({
+            type: "success",
+            text1: "Success ✅",
+            text2: msg,
+            visibilityTime: 2200,
+            position: "top",
+            topOffset: 10,
+        });
+    };
+
+    const showErrorToast = (errMsg) => {
+        Toast.show({
+            type: "error",
+            text1: "Error 🛑",
+            text2: errMsg,
+            visibilityTime: 2200,
+            position: "top",
+            topOffset: 10,
+        });
     };
 
     return (

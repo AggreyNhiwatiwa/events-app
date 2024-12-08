@@ -14,6 +14,7 @@ import styles from "./styles";
 import { useFocusEffect } from "@react-navigation/native";
 import { EventContext } from "../../context/EventContext";
 import Event from "../../components/Event";
+import Toast from "react-native-toast-message";
 
 export default function AllEventsScreen() {
     const { events, setInFavouriteMode, setInEditingMode } =
@@ -43,18 +44,21 @@ export default function AllEventsScreen() {
     );
 
     return (
-        <View style={styles.container}>
-            <FlatList
-                style={styles.flatListContent}
-                data={events}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-            />
-            <View style={styles.infoBar}>
-                <Text style={styles.infoBarText}>
-                    Press an event to favourite it
-                </Text>
+        <>
+            <Toast />
+            <View style={styles.container}>
+                <FlatList
+                    style={styles.flatListContent}
+                    data={events}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                />
+                <View style={styles.infoBar}>
+                    <Text style={styles.infoBarText}>
+                        Press an event to favourite it
+                    </Text>
+                </View>
             </View>
-        </View>
+        </>
     );
 }

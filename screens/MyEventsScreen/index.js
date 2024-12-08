@@ -36,6 +36,7 @@ import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as database from "../../database";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Toast from "react-native-toast-message";
 
 import { signOut } from "firebase/auth";
 import { auth } from "../../database/config";
@@ -97,6 +98,19 @@ export default function MyEventsScreen() {
         });
     }, [navigation]);
 
+    // Ensures the add modal is empty in the state
+    useEffect(() => {
+        setEventTitle("");
+        setEventDescription("");
+    }, [showAddModal]);
+
+    useFocusEffect(
+        useCallback(() => {
+            setEventTitle("");
+            setEventDescription("");
+        }, [])
+    );
+
     //TODO: Add success/err toasts here
     const handleLogout = () => {
         signOut(auth)
@@ -106,10 +120,9 @@ export default function MyEventsScreen() {
                 setAuthId(null);
                 setFavouritedEvents([]);
                 setMyEvents([]);
-                console.log("Successfully signed out");
             })
             .catch(() => {
-                console.log("Error signing users out");
+                showErrorToast("Error signing out. Please try again.");
             });
     };
 
@@ -229,15 +242,40 @@ export default function MyEventsScreen() {
                             const updatedFavourites =
                                 await database.getFavouritesForUser(userId);
                             setFavouritedEvents(updatedFavourites);
-
                             setShowAddModal(false);
+                            showSuccessToast("Event added.");
                         } else {
-                            console.log("Failed to add to db.");
+                            showErrorToast(
+                                "Failed to add event. Please try again."
+                            );
                         }
                     },
                 },
             ]
         );
+    };
+
+    /* Toast logic */
+    const showSuccessToast = (msg) => {
+        Toast.show({
+            type: "success",
+            text1: "Success ✅",
+            text2: msg,
+            visibilityTime: 2200,
+            position: "top",
+            topOffset: 10,
+        });
+    };
+
+    const showErrorToast = (errMsg) => {
+        Toast.show({
+            type: "error",
+            text1: "Error 🛑",
+            text2: errMsg,
+            visibilityTime: 2200,
+            position: "top",
+            topOffset: 10,
+        });
     };
 
     const renderItem = ({ item }) => (
@@ -328,7 +366,9 @@ export default function MyEventsScreen() {
                         <Text style={styles.modalButtonText}>ADD</Text>
                     </Pressable>
                 </View>
+                
             </Modal>
+            <Toast />
         </>
     );
 }

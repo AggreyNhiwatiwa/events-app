@@ -106,7 +106,7 @@ export async function getUserDocIdByAuthId(authId) {
         if (!querySnapshot.empty) {
             return querySnapshot.docs[0].id;
         } else {
-            console.error("No user found with the passed authId.");
+            console.log("No user found with the passed authId.");
             return null;
         }
     } catch (error) {
@@ -160,7 +160,7 @@ export async function getFavouritesForUser(userId) {
 
         return favoriteEvents;
     } catch (error) {
-        console.error("Error fetching favorites:", error.message);
+        console.log("Error fetching favorites:", error.message);
         return [];
     }
 }
