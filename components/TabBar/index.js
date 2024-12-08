@@ -37,10 +37,10 @@ export default function TabBar() {
                 component={AllEventsScreen}
                 options={() => ({
                     title: "Events",
-                    headerTitle: `Events(${events.length})`,
+                    headerTitle: `Events (${events.length})`,
                     headerShown: true,
                     headerStyle: {
-                        backgroundColor: "#4B006E",
+                        backgroundColor: "#1E3F5A",
                     },
                     headerTintColor: "#FFFFFF",
                     headerTitleStyle: {
@@ -63,10 +63,10 @@ export default function TabBar() {
                 component={MyEventsScreen}
                 options={() => ({
                     title: "My Events",
-                    headerTitle: `My Events(${myEvents.length})`,
+                    headerTitle: `My Events (${myEvents.length})`,
                     headerShown: true,
                     headerStyle: {
-                        backgroundColor: "#4B006E",
+                        backgroundColor: "#1E3F5A",
                     },
                     headerTintColor: "#FFFFFF",
                     headerTitleStyle: {
@@ -92,7 +92,7 @@ export default function TabBar() {
                     headerTitle: `Favourites (${favouritedEvents.length})`,
                     headerShown: true,
                     headerStyle: {
-                        backgroundColor: "#4B006E",
+                        backgroundColor: "#1E3F5A",
                     },
                     headerTintColor: "#FFFFFF",
                     headerTitleStyle: {

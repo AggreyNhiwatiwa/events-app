@@ -85,6 +85,10 @@ export default function Event({ id, title, description, date, time }) {
     const [selectedDate, setSelectedDate] = useState(dateAsDate);
     const [selectedTime, setSelectedTime] = useState(timeAsDate);
 
+    // Formatted time for the UI
+    const formattedDate = format(dateAsDate, "MMM dd");
+    const [month, day] = formattedDate.split(' ');
+
     // Formatting in 12hr format just for UI
     const formattedTime = format(timeAsDate, "hh:mm a");
 
@@ -361,18 +365,25 @@ export default function Event({ id, title, description, date, time }) {
                 onPress={() => handleEventPress(id)}
             >
                 <View style={styles.leftContainer}>
+                    <View style={styles.dateBox}>
+                    <Text style={styles.subHeading}>{month}</Text>
+                    <Text style={styles.subHeading}>{day}</Text>
+                    </View>
+
+                </View>
+
+                <View style={styles.centreContainer}>
+                    <Text style={styles.mainHeading}>{title}</Text>
+
+                    <Text style={styles.subHeading}>{formattedTime}</Text>
+                    <Text style={styles.descriptionHeading}>{description}</Text>
+                </View>
+                <View style={styles.rightContainer}>
                     <MaterialCommunityIcons
                         name={eventIsFavourited ? "heart" : "heart-outline"}
                         size={30}
+                        color="#1E3F5A"
                     />
-                </View>
-
-                <View style={styles.rightContainer}>
-                    <Text style={styles.mainHeading}>{title}</Text>
-                    <Text style={styles.subHeading}>
-                        {date} @ {formattedTime}
-                    </Text>
-                    <Text style={styles.subHeading}>{description}</Text>
                 </View>
             </Pressable>
 

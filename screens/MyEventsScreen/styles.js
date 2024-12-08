@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     },
     infoBar: {
         alignItems: "center",
-        backgroundColor: "#000000",
+        backgroundColor: "#1E3F5A",
         width: 400,
         height: 40,
         justifyContent: "center",

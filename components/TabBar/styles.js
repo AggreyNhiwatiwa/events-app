@@ -12,6 +12,6 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   tabbar: {
-    backgroundColor: "#4B006E",
+    backgroundColor: "#1E3F5A",
   },
 });

@@ -16,47 +16,66 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         marginTop: 8,
         width: 380,
-        height: 120,
-        paddingLeft: 14,
-        paddingRight: 14,
+        height: 100,
+        paddingHorizontal: 14,
         alignItems: "center",
         justifyContent: "space-around",
-        backgroundColor: "#FCF5E5",
-        borderWidth: 2,
+        // backgroundColor: "#FCF5E5",
+        borderWidth: 1.2,
         borderRadius: 6,
     },
-    image: {
-        width: 100,
-        height: 160,
-        borderRadius: 8,
-    },
     leftContainer: {
-        width: 50,
-        height: 120,
+        width: 70,
+        height: 100,
         justifyContent: "center",
+        padding: 2,
     },
-    rightContainer: {
-        width: 330,
-        height: 120,
+    centreContainer: {
+        width: 300,
+        height: 100,
         alignItems: "flex-start",
-        paddingLeft: 40,
+        paddingLeft: 20,
         paddingTop: 6,
     },
+    rightContainer: {
+        width: 30,
+        height: 100,
+        justifyContent: "center",
+    },
+    dateBox: {
+        width: "100%",
+        height: "90%",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#D3D3D3",
+        borderRadius: 4,
+    },
     mainHeading: {
-        fontSize: "24",
-        fontWeight: "1000",
+        fontSize: "22",
+        fontWeight: "600",
     },
     subHeading: {
-        fontSize: "20",
+        fontSize: "18",
         fontWeight: "1000",
         color: "#5C5C5C",
     },
-    borrowedText: {
-        color: "#8A0000",
+    descriptionHeading: {
+        fontSize: "16",
+        fontStyle: "italic",
+        color: "#5C5C5C",
     },
-    availableText: {
-        color: "#007038",
-    },
+
+
+
+
+
+
+
+
+
+
+
+
     modalContainer: {
         flex: 1,
         justifyContent: "center",
