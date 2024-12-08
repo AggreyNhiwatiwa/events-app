@@ -260,9 +260,7 @@ export default function MyEventsScreen() {
                             />
                         </TouchableOpacity>
                     </View>
-
                     <Text style={styles.modalTitle}>Add Event</Text>
-
                     <View style={styles.modalInputContainer}>
                         <Text style={styles.modalSubtitle}>Title</Text>
                         <TextInput

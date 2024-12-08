@@ -69,67 +69,75 @@ const styles = StyleSheet.create({
         fontStyle: "italic",
         color: "#5C5C5C",
     },
-
-
-
-
-
-
-
-
-
-
-
-
     modalContainer: {
         flex: 1,
-        justifyContent: "center",
         alignItems: "center",
         padding: 10,
+        paddingTop: 100,
+        backgroundColor: "rgba(255, 231, 51, 0.5)",
+    },
+    modalTopContainer: {
+        width: 380,
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "left",
+    },
+    modalInputContainer: {
+        alignItems: "left",
     },
     inputContainer: {
         fontSize: 20,
-        margin: 20,
         width: 350,
         height: 40,
         textAlign: "center",
         borderWidth: 2,
         borderRadius: 4,
-        borderColor: "#808080",
+        borderColor: "#1E3F5A",
+        marginBottom: 10,
+    },
+    modalTitle: {
+        fontSize: 30,
+        fontWeight: "600",
+        marginBottom: 20,
+        color: "#1E3F5A",
+    },
+    modalSubtitle: {
+        marginTop: 10,
+        fontSize: 20,
+        fontWeight: "600",
+        textAlign: "left",
+        color: "#1E3F5A",
     },
     modalButton: {
-        // fontSize: 20,
-        //backgroundColor: "#000000",
-
+        backgroundColor: "#1E3F5A",
         margin: 10,
-        width: 100,
+        width: 160,
         height: 40,
-        textAlign: "center",
+        justifyContent: "center",
         alignItems: "center",
         borderWidth: 2,
         borderRadius: 4,
-        borderColor: "#808080",
     },
-
+    deleteButton: {
+        backgroundColor: "red",
+    },
     modalButtonText: {
         fontSize: 20,
+        fontWeight: "600",
+        color: "#FFFFFF",
     },
-
-    switchContainer: {
-        flexDirection: "row",
-        fontSize: 20,
-        margin: 20,
-        width: 240,
+    infoBar: {
+        alignItems: "center",
+        backgroundColor: "#1E3F5A",
+        width: 400,
         height: 40,
-        textAlign: "center",
         justifyContent: "center",
-        borderWidth: 2,
-        borderRadius: 4,
-        borderColor: "#808080",
+        marginBottom: 0,
+        borderWidth: 0,
     },
-
-    switchText: {
-        fontSize: 20,
+    infoBarText: {
+        color: "#FFE733",
+        fontStyle: "italic",
     },
 });
 

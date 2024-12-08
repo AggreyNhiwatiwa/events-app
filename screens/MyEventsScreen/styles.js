@@ -6,7 +6,7 @@ Lab 4
 */
 
 /*
-Styles for the my Events screen
+Styles for the my Events screen and the Add Event modal.
 */
 import { StyleSheet } from "react-native";
 
@@ -57,22 +57,6 @@ const styles = StyleSheet.create({
         textAlign: "left",
         color: "#1E3F5A",
     },
-
-    modalButton: {
-        backgroundColor: "#1E3F5A",
-        margin: 10,
-        width: 100,
-        height: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: 2,
-        borderRadius: 4,
-    },
-    modalButtonText: {
-        fontSize: 20,
-        fontWeight: "600",
-        color: "#FFFFFF",
-    },
     switchContainer: {
         flexDirection: "row",
         fontSize: 20,
@@ -91,6 +75,21 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         textAlign: "left",
         color: "#1E3F5A",
+    },
+    modalButton: {
+        backgroundColor: "#1E3F5A",
+        margin: 10,
+        width: 100,
+        height: 40,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 2,
+        borderRadius: 4,
+    },
+    modalButtonText: {
+        fontSize: 20,
+        fontWeight: "600",
+        color: "#FFFFFF",
     },
     infoBar: {
         alignItems: "center",

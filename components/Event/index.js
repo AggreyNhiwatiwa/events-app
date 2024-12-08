@@ -11,9 +11,9 @@ import {
     Alert,
     Modal,
     Pressable,
-    Switch,
     Text,
     TextInput,
+    TouchableOpacity,
     View,
 } from "react-native";
 
@@ -87,7 +87,7 @@ export default function Event({ id, title, description, date, time }) {
 
     // Formatted time for the UI
     const formattedDate = format(dateAsDate, "MMM dd");
-    const [month, day] = formattedDate.split(' ');
+    const [month, day] = formattedDate.split(" ");
 
     // Formatting in 12hr format just for UI
     const formattedTime = format(timeAsDate, "hh:mm a");
@@ -366,10 +366,9 @@ export default function Event({ id, title, description, date, time }) {
             >
                 <View style={styles.leftContainer}>
                     <View style={styles.dateBox}>
-                    <Text style={styles.dateBoxText}>{month}</Text>
-                    <Text style={styles.dateBoxText}>{day}</Text>
+                        <Text style={styles.dateBoxText}>{month}</Text>
+                        <Text style={styles.dateBoxText}>{day}</Text>
                     </View>
-
                 </View>
 
                 <View style={styles.centreContainer}>
@@ -388,26 +387,44 @@ export default function Event({ id, title, description, date, time }) {
 
             <Modal visible={showEditModal} animationType="slide">
                 <View style={styles.modalContainer}>
+                    <View style={styles.modalTopContainer}>
+                        <TouchableOpacity
+                            onPress={handleCloseEditModal}
+                            style={{ marginLeft: 15 }}
+                        >
+                            <MaterialCommunityIcons
+                                name="close-box"
+                                size={40}
+                                color="#1E3F5A"
+                            />
+                        </TouchableOpacity>
+                    </View>
                     <Text style={styles.modalTitle}>Edit Event</Text>
-                    <TextInput
-                        style={styles.inputContainer}
-                        placeholder="Enter an event title"
-                        maxLength={150}
-                        onChangeText={handleTitleChange}
-                        value={eventTitle}
-                    />
-                    <TextInput
-                        style={styles.inputContainer}
-                        placeholder="Enter an event description"
-                        maxLength={150}
-                        onChangeText={handleDescriptionChange}
-                        value={eventDescription}
-                    />
+                    <View style={styles.modalInputContainer}>
+                        <Text style={styles.modalSubtitle}>Title</Text>
+                        <TextInput
+                            style={styles.inputContainer}
+                            placeholder="Enter an event title"
+                            maxLength={150}
+                            onChangeText={handleTitleChange}
+                            value={eventTitle}
+                        />
+                        <Text style={styles.modalSubtitle}>Description</Text>
+                        <TextInput
+                            style={styles.inputContainer}
+                            placeholder="Enter an event description"
+                            maxLength={150}
+                            onChangeText={handleDescriptionChange}
+                            value={eventDescription}
+                        />
+                    </View>
+                    <Text style={styles.modalSubtitle}>Date</Text>
                     <DateTimePicker
                         value={selectedDate}
                         onChange={handleDateChange}
                         defaultValue={dateAsDate}
                     />
+                    <Text style={styles.modalSubtitle}>Time</Text>
                     <DateTimePicker
                         mode="time"
                         value={selectedTime}
@@ -421,16 +438,10 @@ export default function Event({ id, title, description, date, time }) {
                         <Text style={styles.modalButtonText}>Edit</Text>
                     </Pressable>
                     <Pressable
-                        style={styles.modalButton}
+                        style={[styles.modalButton, styles.deleteButton]}
                         onPress={handleDeleteEvent}
                     >
                         <Text style={styles.modalButtonText}>Delete</Text>
-                    </Pressable>
-                    <Pressable
-                        style={styles.modalButton}
-                        onPress={handleCloseEditModal}
-                    >
-                        <Text style={styles.modalButtonText}>Close</Text>
                     </Pressable>
                 </View>
             </Modal>
