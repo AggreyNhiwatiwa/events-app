@@ -18,6 +18,80 @@ const styles = StyleSheet.create({
     flatListContent: {
         flexGrow: 1,
     },
+    modalContainer: {
+        flex: 1,
+        alignItems: "center",
+        padding: 10,
+        paddingTop: 100,
+        backgroundColor: "rgba(255, 231, 51, 0.5)",
+    },
+    modalTopContainer: {
+        width: 380,
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "left",
+    },
+    modalInputContainer: {
+        alignItems: "left",
+    },
+    inputContainer: {
+        fontSize: 20,
+        width: 350,
+        height: 40,
+        textAlign: "center",
+        borderWidth: 2,
+        borderRadius: 4,
+        borderColor: "#1E3F5A",
+        marginBottom: 10,
+    },
+    modalTitle: {
+        fontSize: 30,
+        fontWeight: "600",
+        marginBottom: 20,
+        color: "#1E3F5A",
+    },
+    modalSubtitle: {
+        marginTop: 10,
+        fontSize: 20,
+        fontWeight: "600",
+        textAlign: "left",
+        color: "#1E3F5A",
+    },
+
+    modalButton: {
+        backgroundColor: "#1E3F5A",
+        margin: 10,
+        width: 100,
+        height: 40,
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 2,
+        borderRadius: 4,
+    },
+    modalButtonText: {
+        fontSize: 20,
+        fontWeight: "600",
+        color: "#FFFFFF",
+    },
+    switchContainer: {
+        flexDirection: "row",
+        fontSize: 20,
+        margin: 20,
+        width: 350,
+        height: 40,
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 10,
+        borderWidth: 2,
+        borderRadius: 4,
+        borderColor: "#808080",
+    },
+    switchText: {
+        fontSize: 20,
+        fontWeight: "600",
+        textAlign: "left",
+        color: "#1E3F5A",
+    },
     infoBar: {
         alignItems: "center",
         backgroundColor: "#1E3F5A",
@@ -31,65 +105,6 @@ const styles = StyleSheet.create({
         color: "#FFE733",
         fontStyle: "italic",
     },
-
-    modalContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 10,
-    },
-
-    inputContainer: {
-        fontSize: 20,
-        margin: 20,
-        width: 350,
-        height: 40,
-        textAlign: "center",
-        borderWidth: 2,
-        borderRadius: 4,
-        borderColor: "#808080",
-    },
-
-    modalTitle: {
-        fontSize: 30
-    },
-
-    modalButton: {
-        // fontSize: 20,
-        //backgroundColor: "#000000",
-        
-        margin: 10,
-        width: 100,
-        height: 40,
-        textAlign: "center",
-        alignItems: "center",
-        borderWidth: 2,
-        borderRadius: 4,
-        borderColor: "#808080",
-    },
-
-    modalButtonText: {
-        fontSize: 20
-    },
-
-    switchContainer: {
-        flexDirection: "row",
-        fontSize: 20,
-        margin: 20,
-        width: 240,
-        height: 40,
-        textAlign: "center",
-        justifyContent: "center",
-        borderWidth: 2,
-        borderRadius: 4,
-        borderColor: "#808080",
-    },
-
-    switchText: {
-        fontSize: 20,
-    },
-
-
 });
 
 export default styles;

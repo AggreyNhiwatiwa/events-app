@@ -21,7 +21,6 @@ import AllEventsScreen from "../../screens/AllEventsScreen";
 const Tab = createBottomTabNavigator();
 
 export default function TabBar() {
- 
     const { favouritedEvents, myEvents, events } = useContext(EventContext);
 
     return (

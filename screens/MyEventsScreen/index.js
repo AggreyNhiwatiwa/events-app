@@ -248,47 +248,66 @@ export default function MyEventsScreen() {
             </View>
             <Modal visible={showAddModal} animationType="slide">
                 <View style={styles.modalContainer}>
+                    <View style={styles.modalTopContainer}>
+                        <TouchableOpacity
+                            onPress={handleCloseAddModal}
+                            style={{ marginLeft: 15 }}
+                        >
+                            <MaterialCommunityIcons
+                                name="close-box"
+                                size={40}
+                                color="#1E3F5A"
+                            />
+                        </TouchableOpacity>
+                    </View>
+
                     <Text style={styles.modalTitle}>Add Event</Text>
-                    <TextInput
-                        style={styles.inputContainer}
-                        placeholder="Enter an event title"
-                        maxLength={150}
-                        onChangeText={handleTitleChange}
-                        defaultValue={eventTitle}
-                    />
-                    <TextInput
-                        style={styles.inputContainer}
-                        placeholder="Enter an event description"
-                        maxLength={150}
-                        onChangeText={handleDescriptionChange}
-                        defaultValue={eventDescription}
-                    />
+
+                    <View style={styles.modalInputContainer}>
+                        <Text style={styles.modalSubtitle}>Title</Text>
+                        <TextInput
+                            style={styles.inputContainer}
+                            placeholder="Enter an event title"
+                            maxLength={150}
+                            onChangeText={handleTitleChange}
+                            defaultValue={eventTitle}
+                        />
+                        <Text style={styles.modalSubtitle}>Description</Text>
+                        <TextInput
+                            style={styles.inputContainer}
+                            placeholder="Enter an event description"
+                            maxLength={150}
+                            onChangeText={handleDescriptionChange}
+                            defaultValue={eventDescription}
+                        />
+                    </View>
+
+                    <Text style={styles.modalSubtitle}>Date</Text>
                     <DateTimePicker value={date} onChange={handleDateChange} />
+                    <Text style={styles.modalSubtitle}>Time</Text>
                     <DateTimePicker
                         mode="time"
                         value={time}
                         onChange={handleTimeChange}
                     />
+
                     <View style={styles.switchContainer}>
                         <Text style={styles.switchText}>
-                            Add to favourites?:
+                            Add to favourites?
                         </Text>
                         <Switch
                             value={initFavourite}
                             onValueChange={handleInitFavouriteToggle}
+                            trackColor={{
+                                true: "#1E3F5A",
+                            }}
                         />
                     </View>
                     <Pressable
                         style={styles.modalButton}
                         onPress={handleAddNewEvent}
                     >
-                        <Text style={styles.modalButtonText}>Add</Text>
-                    </Pressable>
-                    <Pressable
-                        style={styles.modalButton}
-                        onPress={handleCloseAddModal}
-                    >
-                        <Text style={styles.modalButtonText}>Close</Text>
+                        <Text style={styles.modalButtonText}>ADD</Text>
                     </Pressable>
                 </View>
             </Modal>
