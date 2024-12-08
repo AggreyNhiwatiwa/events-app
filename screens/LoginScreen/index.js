@@ -1,6 +1,6 @@
 import styles from "./styles";
 import { useContext, useEffect, useState } from "react";
-import { Button, Modal, Text, TextInput, View } from "react-native";
+import { Button, Modal, Pressable, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import {
     createUserWithEmailAndPassword,
@@ -139,7 +139,6 @@ export default function LoginScreen({ setCredentials }) {
                 //Adding user to the "users" collection in the db
                 database.addUser("Test name", email, user.uid);
 
-
                 // Set context auths
                 setAuthId(user.uid);
                 setIsAuthenticated(true);
@@ -243,18 +242,31 @@ export default function LoginScreen({ setCredentials }) {
 
                 <InputMsgBox text={pwdErrTxt}></InputMsgBox>
 
-                <Button
+                <Pressable
+                    style={[
+                        styles.modalButton,
+                        styles.loginButton,
+                        loginBtnDisabled && styles.disabledButton,
+                    ]}
                     onPress={handleLoginPress}
                     disabled={loginBtnDisabled}
-                    title="Login"
-                />
+                >
+                    <Text style={styles.modalButtonText}>Login</Text>
+                </Pressable>
 
-                <Button
-                    title="Forgotten Password?"
+                <Pressable
+                    style={styles.modalButton}
                     onPress={handleForgotPasswordPress}
-                ></Button>
+                >
+                    <Text style={styles.modalButtonText}>Forgot Password?</Text>
+                </Pressable>
 
-                <Button title="Sign up" onPress={handleSignUpPress}></Button>
+                <Pressable
+                    style={[styles.modalButton, styles.forgotPasswordButton]}
+                    onPress={handleSignUpPress}
+                >
+                    <Text style={styles.modalButtonText}>Sign up</Text>
+                </Pressable>
 
                 <View style={styles.footer}>
                     <Text>Aggrey Nhiwatiwa © Copyright 2024</Text>
