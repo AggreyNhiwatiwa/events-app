@@ -65,7 +65,6 @@ export default function FavouriteEventsScreen() {
                     )}
                 </View>
             </View>
-            <Toast />
         </>
     );
 }

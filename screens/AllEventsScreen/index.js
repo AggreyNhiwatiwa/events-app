@@ -45,7 +45,6 @@ export default function AllEventsScreen() {
 
     return (
         <>
-            <Toast />
             <View style={styles.container}>
                 <FlatList
                     style={styles.flatListContent}

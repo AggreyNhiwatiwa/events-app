@@ -275,8 +275,7 @@ export default function MyEventsScreen() {
             text1: "Success ✅",
             text2: msg,
             visibilityTime: 2200,
-            position: "top",
-            topOffset: 10,
+            topOffset: 60,
         });
     };
 
@@ -286,8 +285,7 @@ export default function MyEventsScreen() {
             text1: "Error 🛑",
             text2: errMsg,
             visibilityTime: 2200,
-            position: "top",
-            topOffset: 10,
+            topOffset: 60,
         });
     };
 
@@ -381,7 +379,6 @@ export default function MyEventsScreen() {
                 </View>
                 
             </Modal>
-            <Toast />
         </>
     );
 }

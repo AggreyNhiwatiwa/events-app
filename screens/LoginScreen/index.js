@@ -206,7 +206,7 @@ export default function LoginScreen({ setCredentials }) {
             type: "success",
             text1: "Success ✅",
             text2: msg,
-            position: "bottom",
+            topOffset: 60,
         });
     };
 
@@ -216,14 +216,13 @@ export default function LoginScreen({ setCredentials }) {
             text1: "Error 🛑",
             text2: errMsg,
             visibilityTime: 2200,
-            position: "bottom",
+            topOffset: 60,
         });
     };
 
     return (
         <>
             <View style={styles.container} setCredentials={setCredentials}>
-                <Toast />
                 <TextInput
                     style={styles.textInputContainer}
                     placeholder="Email Address"
@@ -285,7 +284,6 @@ export default function LoginScreen({ setCredentials }) {
                             onPress={handleModalToggle}
                         ></Button>
                     </View>
-                    <Toast />
                 </Modal>
 
                 <Modal animationType="slide" visible={showSignUpModal}>
@@ -322,7 +320,6 @@ export default function LoginScreen({ setCredentials }) {
                             onPress={handleSignUpModalToggle}
                         ></Button>
                     </View>
-                    <Toast />
                 </Modal>
             </View>
         </>

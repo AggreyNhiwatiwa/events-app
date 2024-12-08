@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import * as database from "./database";
 import { AuthContext } from "./context/AuthContext";
 import LoginScreen from "./screens/LoginScreen";
+import Toast from 'react-native-toast-message';
 
 export default function App() {
     const [events, setEvents] = useState([]);
@@ -76,6 +77,7 @@ export default function App() {
     }
 
     return (
+        <>
         <AuthContext.Provider
             value={{
                 isAuthenticated,
@@ -105,5 +107,7 @@ export default function App() {
                 </NavigationContainer>
             </EventContext.Provider>
         </AuthContext.Provider>
+        <Toast />
+        </>
     );
 }

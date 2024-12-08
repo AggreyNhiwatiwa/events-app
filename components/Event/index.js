@@ -425,8 +425,7 @@ export default function Event({ id, title, description, date, time }) {
             text1: "Success ✅",
             text2: msg,
             visibilityTime: 2200,
-            position: "top",
-            topOffset: 10,
+            topOffset: 60,
         });
     };
 
@@ -435,9 +434,8 @@ export default function Event({ id, title, description, date, time }) {
             type: "error",
             text1: "Error 🛑",
             text2: errMsg,
-            visibilityTime: 2200,
-            position: "top",
-            topOffset: 10,
+            visibilityTime: 2200,   
+            topOffset: 60,
         });
     };
 
