@@ -191,6 +191,19 @@ export default function MyEventsScreen() {
     Gets authorId from global context
     */
     const handleAddNewEvent = async () => {
+
+        if(eventTitle.trim() === "" || eventDescription.trim() === ""){
+
+            Alert.alert(
+                "Required fields missing",
+                `Please ensure all fields are filled out.`,
+                [{ text: "OK" }]
+            );
+
+            return;
+
+        }
+
         Alert.alert(
             "Add Event",
             `Are you sure you want to add the event "${eventTitle}"?`,

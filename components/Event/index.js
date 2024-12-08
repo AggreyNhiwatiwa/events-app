@@ -177,6 +177,19 @@ export default function Event({ id, title, description, date, time }) {
     updates when the update is successful in the database.
     */
     const handleEditEvent = async () => {
+
+        if(eventTitle.trim() === "" || eventDescription.trim() === ""){
+
+            Alert.alert(
+                "Required fields missing",
+                `Please ensure all fields are filled out.`,
+                [{ text: "OK" }]
+            );
+
+            return;
+
+        }
+
         Alert.alert(
             "Edit Event",
             `Are you sure you want to edit the event "${eventTitle}"?`,
