@@ -44,40 +44,44 @@ export default function App() {
         array (for the favourites list).
     */
     useEffect(() => {
-        async function loadAllEvents() {
-            try {
-                const result = await database.getEventsFromDb();
-                const dbEvents = result.map((event) => ({
-                    id: event.id,
-                    authorId: event.authorId,
-                    title: event.title,
-                    description: event.description,
-                    date: event.date,
-                    time: event.time,
-                }));
-                setEvents(dbEvents);
+        if (authId) {
+            async function loadAllEvents() {
+                try {
+                    const result = await database.getEventsFromDb();
+                    const dbEvents = result.map((event) => ({
+                        id: event.id,
+                        authorId: event.authorId,
+                        title: event.title,
+                        description: event.description,
+                        date: event.date,
+                        time: event.time,
+                    }));
+                    setEvents(dbEvents);
 
-                // Getting events made by currently logged in user and setting to state
-                if (authId) {
-                    const initialMyEvents = dbEvents.filter(
-                        (event) => event.authorId === authId
+                    // Getting events made by currently logged in user and setting to state
+                    if (authId) {
+                        const initialMyEvents = dbEvents.filter(
+                            (event) => event.authorId === authId
+                        );
+                        setMyEvents(initialMyEvents);
+                    }
+
+                    // Using helper to get userId
+                    const userDocId = await database.getUserDocIdByAuthId(
+                        authId
                     );
-                    setMyEvents(initialMyEvents);
+
+                    // Getting favourited events for the current user and setting to state
+                    const initialFavouritedEvents =
+                        await database.getFavouritesForUser(userDocId);
+                    setFavouritedEvents(initialFavouritedEvents);
+                } catch (error) {
+                    console.error("Error loading data from the db:", error);
                 }
-
-                // Using helper to get userId
-                const userDocId = await database.getUserDocIdByAuthId(authId);
-
-                // Getting favourited events for the current user and setting to state
-                const initialFavouritedEvents =
-                    await database.getFavouritesForUser(userDocId);
-                setFavouritedEvents(initialFavouritedEvents);
-            } catch (error) {
-                console.error("Error loading data from the db:", error);
             }
-        }
 
-        loadAllEvents();
+            loadAllEvents();
+        }
     }, [authId]);
 
     if (events === null) {

@@ -64,6 +64,7 @@ export default function LoginScreen({ setCredentials }) {
     */
     useEffect(() => {
         updateLoginButtonState();
+        updateSignupButtonState();
     }, [emailIsValid, pwdIsValid]);
 
     /* Handlers */
@@ -93,12 +94,10 @@ export default function LoginScreen({ setCredentials }) {
             setEmailIsValid(false);
             setEmailErrTxt("Please enter a valid email");
             setPasswordResetBtnDisabled(true);
-            setSignUpBtnDisabled(true);
         } else {
             setEmailIsValid(true);
             setEmailErrTxt("");
             setPasswordResetBtnDisabled(false);
-            setSignUpBtnDisabled(false);
         }
     };
 
@@ -194,6 +193,14 @@ export default function LoginScreen({ setCredentials }) {
             setSignUpBtnDisabled(false);
         } else {
             setLoginBtnDisabled(true);
+            setSignUpBtnDisabled(true);
+        }
+    };
+
+    const updateSignupButtonState = () => {
+        if (emailIsValid && pwdIsValid) {
+            setSignUpBtnDisabled(false);
+        } else {
             setSignUpBtnDisabled(true);
         }
     };
